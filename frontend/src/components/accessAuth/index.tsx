@@ -1,23 +1,30 @@
-import { FC, useEffect } from 'react';
+import { FC, ReactElement, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import mobxStore from '@/mobxStore';
-import { history, Outlet, useLocation } from 'umi';
+import { history, useLocation } from 'umi';
 import { message } from 'antd';
-const AccessAuth: FC<{}> = () => {
+
+const AccessAuth: FC<{ children: ReactElement }> = ({ children }) => {
   const location = useLocation();
 
-  // 控制登陆才可访问的页面
-  const requiredLoginPages = ['/'];
+  // 管理员才可访问的页面
+  const requiredAdminPages: string[] = [];
   useEffect(() => {
-    if (
-      !mobxStore.user.token &&
-      requiredLoginPages.some((page) => location.pathname === page)
-    ) {
-      message.warning('请登录!');
-      history.push('/login');
+    if (!mobxStore.user.token) {
+      message.warning('请登录');
+      history.replace('/login');
+      return;
     }
-  }, [location.pathname]);
+    if (
+      mobxStore.user.role !== 'admin' &&
+      requiredAdminPages.some((page) => location.pathname === page)
+    ) {
+      message.warning('无权限');
+      history.back();
+      return;
+    }
+  }, [location.pathname, mobxStore.user.token, mobxStore.user.role]);
 
-  return <Outlet />;
+  return children;
 };
 export default observer(AccessAuth);
