@@ -7,7 +7,6 @@ import Style from './index.module.less';
 import { history } from 'umi';
 import mobxStore from '@/mobxStore';
 import services from '@/services';
-import { useFmtMsg } from '@/hooks/useFmtMsg';
 import loginIcon from '@/assets/loginIcon.png';
 
 interface IFormData {
@@ -16,7 +15,6 @@ interface IFormData {
 }
 
 const Login: FC = () => {
-  const f = useFmtMsg();
   const [loading, setLoading] = useState<boolean>(false);
 
   const [loginForm] = Form.useForm<IFormData>();

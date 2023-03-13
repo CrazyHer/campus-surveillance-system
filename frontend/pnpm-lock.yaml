@@ -3,12 +3,14 @@ lockfileVersion: 5.4
 specifiers:
   '@ant-design/icons': ^5.0.1
   '@types/crypto-js': ^4.1.1
+  '@types/leaflet': ^1.9.1
   '@types/react': ^18.0.0
   '@types/react-dom': ^18.0.0
   '@umijs/plugins': ^4.0.53
   antd: ^5.2.2
   crypto-js: ^4.1.1
   eslint: ^8.35.0
+  leaflet: ^1.9.3
   mobx: ^6.8.0
   mobx-react: ^7.6.0
   prettier: ^2
@@ -23,12 +25,14 @@ dependencies:
   '@umijs/plugins': 4.0.53_md3fdo25udhkvju4tv62lemq3i
   antd: 5.2.2
   crypto-js: 4.1.1
+  leaflet: 1.9.3
   mobx: 6.8.0
   mobx-react: 7.6.0_mobx@6.8.0
   umi: 4.0.53_ytpasue5c7w42e45g7m7rimhlm
 
 devDependencies:
   '@types/crypto-js': 4.1.1
+  '@types/leaflet': 1.9.1
   '@types/react': 18.0.28
   '@types/react-dom': 18.0.11
   eslint: 8.35.0
@@ -3119,6 +3123,10 @@ packages:
     resolution: {integrity: sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==}
     dev: true
 
+  /@types/geojson/7946.0.10:
+    resolution: {integrity: sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==}
+    dev: true
+
   /@types/glob/7.2.0:
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
     dependencies:
@@ -3169,6 +3177,12 @@ packages:
   /@types/json-schema/7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
     dev: false
+
+  /@types/leaflet/1.9.1:
+    resolution: {integrity: sha512-lYawM3I3lLO6rmBASaqdGgY6zUL4YHr3H79/axx7FNYyPXuj0P1DZHbkNo8Itbv0i7Y9EryLWtDXXROMygXhRA==}
+    dependencies:
+      '@types/geojson': 7946.0.10
+    dev: true
 
   /@types/minimatch/5.1.2:
     resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==}
@@ -6453,6 +6467,10 @@ packages:
 
   /kolorist/1.7.0:
     resolution: {integrity: sha512-ymToLHqL02udwVdbkowNpzjFd6UzozMtshPQKVi5k1EjKRqKqBrOnE9QbLEb0/pV76SAiIT13hdL8R6suc+f3g==}
+    dev: false
+
+  /leaflet/1.9.3:
+    resolution: {integrity: sha512-iB2cR9vAkDOu5l3HAay2obcUHZ7xwUBBjph8+PGtmW/2lYhbLizWtG7nTeYht36WfOslixQF9D/uSIzhZgGMfQ==}
     dev: false
 
   /less/4.1.3:
