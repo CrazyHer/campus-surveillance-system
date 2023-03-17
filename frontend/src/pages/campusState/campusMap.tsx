@@ -49,8 +49,8 @@ const CampusMap: FC<{
   const mapDivRef = useRef<HTMLDivElement>(null);
   const mapObjRef = useRef<leaflet.Map>();
   const markersRef = useRef<leaflet.LayerGroup<leaflet.Marker>>();
-  // use ref to store selectedCameraIds and sync with props
   const selectedCameraIdsRef = useRef<number[]>(props.selectedCameraIds);
+  const onCameraSelectRef = useRef(props.onCameraSelect);
 
   useEffect(() => {
     // init map
@@ -82,6 +82,10 @@ const CampusMap: FC<{
   }, []);
 
   useEffect(() => {
+    onCameraSelectRef.current = props.onCameraSelect;
+  }, [props.onCameraSelect]);
+
+  useEffect(() => {
     // render camera markers
     if (mapObjRef.current && props.cameraList) {
       markersRef.current = leaflet.layerGroup();
@@ -97,7 +101,7 @@ const CampusMap: FC<{
           .bindTooltip(camera.cameraName);
 
         marker.on('click', () => {
-          props.onCameraSelect(camera.cameraID, camera);
+          onCameraSelectRef.current(camera.cameraID, camera);
         });
         markersRef.current && marker.addTo(markersRef.current);
       });
@@ -106,7 +110,7 @@ const CampusMap: FC<{
         markersRef.current?.remove();
       };
     }
-  }, [props.cameraList, mapObjRef.current, props.onCameraSelect]);
+  }, [props.cameraList]);
 
   useEffect(() => {
     // sync selectedCameraIds with props, and update selected camera icon

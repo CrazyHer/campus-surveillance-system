@@ -1,8 +1,8 @@
 import ServiceTypes from '@/services/serviceTypes';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useRef } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import hls from 'hls.js';
-import { Badge, Button, Card, Descriptions, Table } from 'antd';
+import { Badge, Button, Card, Descriptions, message, Spin, Table } from 'antd';
 import Styles from './index.module.less';
 import { ColumnType } from 'antd/es/table';
 import constants from '@/constants';
@@ -50,6 +50,8 @@ const CameraInfo: FC<{
     },
   ];
 
+  const [videoLoading, setVideoLoading] = useState(false);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     if (
@@ -57,15 +59,16 @@ const CameraInfo: FC<{
       props.data &&
       props.data?.cameraStatus !== constants.cameraStatus.OFFLINE
     ) {
-      console.log('videoRef.current', videoRef.current);
+      setVideoLoading(true);
       if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-        videoRef.current.src = props.data?.hlsUrl || '';
+        videoRef.current.src = props.data.hlsUrl;
       } else if (hls.isSupported()) {
         const hlsPlayer = new hls({ lowLatencyMode: true });
-        hlsPlayer.loadSource(props.data?.hlsUrl || '');
+        hlsPlayer.loadSource(props.data.hlsUrl);
         hlsPlayer.attachMedia(videoRef.current);
       } else {
         videoRef.current.innerText = '您的浏览器不支持查看摄像头视频';
+        setVideoLoading(false);
       }
     }
   }, [props.data, videoRef.current]);
@@ -76,23 +79,22 @@ const CameraInfo: FC<{
       className={Styles.cameraInfoCard}
       bordered={false}
       size="small"
-      extra={<Button>关闭</Button>}
     >
-      <Descriptions
-        layout="vertical"
-        column={1}
-        size="small"
-        className={Styles.cameraDesc}
-      >
-        <Descriptions.Item label="实时画面">
+      {props?.data?.cameraStatus !== constants.cameraStatus.OFFLINE && (
+        <Spin spinning={videoLoading}>
           <video
+            onPlay={() => setVideoLoading(false)}
+            onError={() => {
+              setVideoLoading(false);
+              message.error('视频加载失败');
+            }}
             ref={videoRef}
             className={Styles.cameraVideo}
             autoPlay={true}
             muted
           />
-        </Descriptions.Item>
-      </Descriptions>
+        </Spin>
+      )}
 
       <Descriptions column={1} size="small" className={Styles.cameraDesc}>
         <Descriptions.Item label="名称">
@@ -126,6 +128,7 @@ const CameraInfo: FC<{
       >
         <Descriptions.Item label="异常报警事件">
           <Table
+            pagination={{ pageSize: 5 }}
             size="small"
             columns={tableColumns}
             dataSource={props.data?.alarmEvents}

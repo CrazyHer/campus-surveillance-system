@@ -1,6 +1,6 @@
 import services from '@/services';
 import ServiceTypes from '@/services/serviceTypes';
-import { Button, message, Spin } from 'antd';
+import { message, Spin } from 'antd';
 import { observer } from 'mobx-react';
 import { FC, useCallback, useEffect, useState } from 'react';
 import CameraInfo from './cameraInfo';
@@ -27,24 +27,44 @@ const CampusState: FC = () => {
   };
 
   const handleSelectCamera = useCallback(
-    (
-      currentCameraId: number,
-      cameraInfo: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0],
-    ) => {
-      console.log('cameraInfo', selectedCameraIds, cameraInfo);
-      setSelectedCameraIds([currentCameraId]);
+    (currentCameraId: number) => {
+      if (selectedCameraIds.includes(currentCameraId)) {
+        setSelectedCameraIds([]);
+      } else {
+        setSelectedCameraIds([currentCameraId]);
+      }
     },
-    [],
+    [selectedCameraIds],
   );
 
-  const handleCheckCamera = useCallback((cameraID: number) => {
-    console.log('handleCheckCamera', cameraID);
-    setSelectedCameraIds([cameraID]);
-  }, []);
+  const handleCheckCamera = useCallback(
+    (cameraID: number) => {
+      if (selectedCameraIds.includes(cameraID)) return;
+      console.log('handleCheckCamera', cameraID);
+      setSelectedCameraIds([cameraID]);
+    },
+    [selectedCameraIds],
+  );
 
   useEffect(() => {
     fetchCampusState();
   }, []);
+
+  const [cameraInfoData, setCameraInfoData] =
+    useState<
+      ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0]
+    >();
+  const [showCameraInfo, setShowCameraInfo] = useState(false);
+  useEffect(() => {
+    if (data?.cameraList && selectedCameraIds[0]) {
+      setCameraInfoData(
+        data.cameraList.find((item) => item.cameraID === selectedCameraIds[0]),
+      );
+      setShowCameraInfo(true);
+    } else {
+      setShowCameraInfo(false);
+    }
+  }, [selectedCameraIds]);
 
   return (
     <Spin spinning={loading}>
@@ -67,8 +87,12 @@ const CampusState: FC = () => {
           />
         </div>
 
-        <div className={Styles.rightPanel}>
-          <CameraInfo data={data?.cameraList[0]} />
+        <div
+          className={`${Styles.rightPanel} ${
+            showCameraInfo ? '' : Styles.hide
+          }`}
+        >
+          {showCameraInfo && <CameraInfo data={cameraInfoData} />}
         </div>
       </div>
     </Spin>
