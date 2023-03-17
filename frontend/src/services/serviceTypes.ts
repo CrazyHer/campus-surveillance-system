@@ -24,6 +24,7 @@ export default interface ServiceTypes {
           cameraName: string;
           cameraID: number;
           cameraStatus: 'normal' | 'offline' | 'alarm';
+          hlsUrl: string;
           latlng: [number, number];
           cameraModel: string;
           alarmRules: string;

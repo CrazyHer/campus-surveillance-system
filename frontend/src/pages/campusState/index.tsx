@@ -3,12 +3,16 @@ import ServiceTypes from '@/services/serviceTypes';
 import { Button, message, Spin } from 'antd';
 import { observer } from 'mobx-react';
 import { FC, useCallback, useEffect, useState } from 'react';
+import CameraInfo from './cameraInfo';
+import CameraList from './cameraList';
 import CampusMap from './campusMap';
 import Styles from './index.module.less';
+import StatusHeader from './statusHeader';
 const CampusState: FC = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] =
     useState<ServiceTypes['GET /api/getCampusState']['res']['data']>();
+  const [selectedCameraIds, setSelectedCameraIds] = useState<number[]>([]);
   const fetchCampusState = async () => {
     try {
       setLoading(true);
@@ -22,14 +26,21 @@ const CampusState: FC = () => {
     }
   };
 
-  const handleCameraClick = useCallback(
+  const handleSelectCamera = useCallback(
     (
+      currentCameraId: number,
       cameraInfo: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0],
     ) => {
-      console.log('cameraInfo', cameraInfo);
+      console.log('cameraInfo', selectedCameraIds, cameraInfo);
+      setSelectedCameraIds([currentCameraId]);
     },
     [],
   );
+
+  const handleCheckCamera = useCallback((cameraID: number) => {
+    console.log('handleCheckCamera', cameraID);
+    setSelectedCameraIds([cameraID]);
+  }, []);
 
   useEffect(() => {
     fetchCampusState();
@@ -41,32 +52,23 @@ const CampusState: FC = () => {
         <CampusMap
           className={Styles.map}
           cameraList={data?.cameraList}
-          onCameraClick={handleCameraClick}
+          onCameraSelect={handleSelectCamera}
+          selectedCameraIds={selectedCameraIds}
         />
-        <div className={Styles.leftPanel}>
-          <Button
-            onClick={() => {
-              setData({
-                ...data!,
-                cameraList: [
-                  {
-                    cameraName: '摄像头2',
-                    cameraID: 2,
-                    cameraStatus: 'offline',
-                    latlng: [36.66553375772535, 117.13452323144844],
-                    cameraModel: '摄像头型号2',
-                    alarmRules: '报警规则2',
-                    alarmEvents: [],
-                  },
-                ],
-              });
-            }}
-          >
-            +1
-          </Button>
+
+        <div className={Styles.topPanel}>
+          <StatusHeader data={data} />
         </div>
+
+        <div className={Styles.leftPanel}>
+          <CameraList
+            data={data?.cameraList}
+            onCameraCheck={handleCheckCamera}
+          />
+        </div>
+
         <div className={Styles.rightPanel}>
-          <Button>1234</Button>
+          <CameraInfo data={data?.cameraList[0]} />
         </div>
       </div>
     </Spin>

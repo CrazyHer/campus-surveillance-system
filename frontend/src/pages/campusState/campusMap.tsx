@@ -39,20 +39,24 @@ export const createCameraIcon = (
 
 const CampusMap: FC<{
   cameraList?: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'];
-  onCameraClick: (
+  onCameraSelect: (
+    currentCameraId: number,
     cameraInfo: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0],
-  ) => void;
+  ) => any;
+  selectedCameraIds: number[];
   className: string;
 }> = (props) => {
-  const selectedMarker = useRef<leaflet.Marker>();
-  const selectedMarkerIcon = useRef<leaflet.Icon | leaflet.DivIcon>();
-  const mapDiv = useRef<HTMLDivElement>(null);
-  const mapObj = useRef<leaflet.Map>();
+  const mapDivRef = useRef<HTMLDivElement>(null);
+  const mapObjRef = useRef<leaflet.Map>();
+  const markersRef = useRef<leaflet.LayerGroup<leaflet.Marker>>();
+  // use ref to store selectedCameraIds and sync with props
+  const selectedCameraIdsRef = useRef<number[]>(props.selectedCameraIds);
 
   useEffect(() => {
     // init map
-    if (mapDiv.current) {
-      mapObj.current = new leaflet.Map(mapDiv.current, {
+    if (mapDivRef.current) {
+      console.log('init map', mapDivRef.current);
+      mapObjRef.current = new leaflet.Map(mapDivRef.current, {
         attributionControl: false,
         center: [36.66669, 117.13272],
         zoom: 17,
@@ -72,47 +76,58 @@ const CampusMap: FC<{
         ],
       });
       return () => {
-        mapObj.current?.remove();
+        mapObjRef.current?.remove();
       };
     }
   }, []);
 
   useEffect(() => {
-    // update camera markers
-    if (mapObj.current) {
-      const markers = leaflet.layerGroup();
-      props.cameraList?.forEach((camera) => {
+    // render camera markers
+    if (mapObjRef.current && props.cameraList) {
+      markersRef.current = leaflet.layerGroup();
+      props.cameraList.forEach((camera) => {
         const marker = leaflet
           .marker(camera.latlng, {
-            icon: createCameraIcon(camera.cameraStatus, false),
+            icon: createCameraIcon(
+              camera.cameraStatus,
+              selectedCameraIdsRef.current?.includes(camera.cameraID),
+            ),
+            attribution: JSON.stringify(camera),
           })
           .bindTooltip(camera.cameraName);
 
         marker.on('click', () => {
-          if (selectedMarker.current === marker) {
-            // if the current marker is selected, do nothing
-          } else {
-            // set back the previous selected marker
-            if (selectedMarker.current && selectedMarkerIcon.current) {
-              selectedMarker.current.setIcon(selectedMarkerIcon.current);
-            }
-            // set the current marker as selected
-            selectedMarker.current = marker;
-            selectedMarkerIcon.current = marker.getIcon();
-            marker.setIcon(createCameraIcon(camera.cameraStatus, true));
-            props.onCameraClick(camera);
-          }
+          props.onCameraSelect(camera.cameraID, camera);
         });
-        marker.addTo(markers);
+        markersRef.current && marker.addTo(markersRef.current);
       });
-      markers.addTo(mapObj.current);
+      markersRef.current?.addTo(mapObjRef.current);
       return () => {
-        markers.remove();
+        markersRef.current?.remove();
       };
     }
-  }, [props.cameraList, mapObj.current]);
+  }, [props.cameraList, mapObjRef.current, props.onCameraSelect]);
 
-  return <div ref={mapDiv} className={props.className} />;
+  useEffect(() => {
+    // sync selectedCameraIds with props, and update selected camera icon
+    selectedCameraIdsRef.current = props.selectedCameraIds;
+    markersRef.current?.eachLayer((marker) => {
+      const theCamera: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0] =
+        JSON.parse(marker.getAttribution?.() || '');
+      (marker as leaflet.Marker).setIcon(
+        createCameraIcon(
+          theCamera.cameraStatus,
+          selectedCameraIdsRef.current?.includes(theCamera.cameraID),
+        ),
+      );
+      // set map center to the first selected camera
+      if (theCamera.cameraID === props.selectedCameraIds?.[0]) {
+        mapObjRef.current?.setView(theCamera.latlng);
+      }
+    });
+  }, [props.selectedCameraIds]);
+
+  return <div ref={mapDivRef} className={props.className} />;
 };
 
 export default observer(CampusMap);

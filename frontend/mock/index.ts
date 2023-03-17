@@ -29,6 +29,7 @@ export default {
           latlng: [36.666394717516695, 117.13263524798919],
           cameraModel: '摄像头型号1',
           alarmRules: '报警规则1',
+          hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
           alarmEvents: [
             {
               eventID: 1,
@@ -52,6 +53,7 @@ export default {
           cameraModel: '摄像头型号2',
           alarmRules: '报警规则2',
           alarmEvents: [],
+          hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
         },
         {
           cameraName: '摄像头3',
@@ -60,6 +62,7 @@ export default {
           latlng: [36.666747708247264, 117.13250652184426],
           cameraModel: '摄像头型号3',
           alarmRules: '报警规则3',
+          hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
           alarmEvents: [
             {
               eventID: 3,
