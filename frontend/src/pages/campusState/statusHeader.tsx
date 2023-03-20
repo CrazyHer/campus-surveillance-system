@@ -1,5 +1,4 @@
 import ServiceTypes from '@/services/serviceTypes';
-import { Card } from 'antd';
 import { observer } from 'mobx-react';
 import { FC, useEffect, useState } from 'react';
 

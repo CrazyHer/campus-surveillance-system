@@ -55,7 +55,6 @@ const CampusMap: FC<{
   useEffect(() => {
     // init map
     if (mapDivRef.current) {
-      console.log('init map', mapDivRef.current);
       mapObjRef.current = new leaflet.Map(mapDivRef.current, {
         attributionControl: false,
         center: [36.66669, 117.13272],

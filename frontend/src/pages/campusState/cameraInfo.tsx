@@ -6,11 +6,51 @@ import { Badge, Button, Card, Descriptions, message, Spin, Table } from 'antd';
 import Styles from './index.module.less';
 import { ColumnType } from 'antd/es/table';
 import constants from '@/constants';
+import services from '@/services';
 const CameraInfo: FC<{
-  data?: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0];
+  cameraID: number;
 }> = (props) => {
+  const [data, setData] =
+    useState<ServiceTypes['GET /api/getCameraInfo']['res']['data']>();
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const [resolveLoading, setResolveLoading] = useState(false);
+
+  const fetchCameraInfo = async () => {
+    try {
+      setFetchLoading(true);
+      setData(
+        (await services['GET /api/getCameraInfo']({ cameraID: props.cameraID }))
+          .data,
+      );
+    } catch (error) {
+      message.error(String(error));
+      console.error(error);
+    } finally {
+      setFetchLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchCameraInfo();
+  }, [props.cameraID]);
+
+  const handleResolveAlarm = async (eventID: number) => {
+    try {
+      setResolveLoading(true);
+      await services['POST /api/resolveAlarm']({ eventID });
+      setData(
+        (await services['GET /api/getCameraInfo']({ cameraID: props.cameraID }))
+          .data,
+      );
+    } catch (error) {
+      message.error(String(error));
+      console.error(error);
+    } finally {
+      setResolveLoading(false);
+    }
+  };
+
   const tableColumns: ColumnType<
-    ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0]['alarmEvents'][0]
+    ServiceTypes['GET /api/getCameraInfo']['res']['data']['alarmEvents'][0]
   >[] = [
     {
       title: '报警时间',
@@ -40,9 +80,8 @@ const CameraInfo: FC<{
         ) : (
           <Button
             type="link"
-            onClick={() => {
-              console.log(record);
-            }}
+            onClick={() => handleResolveAlarm(record.eventID)}
+            loading={resolveLoading}
           >
             处理
           </Button>
@@ -56,22 +95,27 @@ const CameraInfo: FC<{
   useEffect(() => {
     if (
       videoRef.current &&
-      props.data &&
-      props.data?.cameraStatus !== constants.cameraStatus.OFFLINE
+      data &&
+      data?.cameraStatus !== constants.cameraStatus.OFFLINE
     ) {
       setVideoLoading(true);
       if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-        videoRef.current.src = props.data.hlsUrl;
+        videoRef.current.src = data.hlsUrl;
       } else if (hls.isSupported()) {
         const hlsPlayer = new hls({ lowLatencyMode: true });
-        hlsPlayer.loadSource(props.data.hlsUrl);
+        hlsPlayer.loadSource(data.hlsUrl);
         hlsPlayer.attachMedia(videoRef.current);
       } else {
         videoRef.current.innerText = '您的浏览器不支持查看摄像头视频';
         setVideoLoading(false);
       }
     }
-  }, [props.data, videoRef.current]);
+  }, [data?.hlsUrl, videoRef.current]);
+
+  const handleError = () => {
+    setVideoLoading(false);
+    message.error('视频加载失败');
+  };
 
   return (
     <Card
@@ -79,15 +123,13 @@ const CameraInfo: FC<{
       className={Styles.cameraInfoCard}
       bordered={false}
       size="small"
+      loading={fetchLoading}
     >
-      {props?.data?.cameraStatus !== constants.cameraStatus.OFFLINE && (
+      {data?.cameraStatus !== constants.cameraStatus.OFFLINE && (
         <Spin spinning={videoLoading}>
           <video
             onPlay={() => setVideoLoading(false)}
-            onError={() => {
-              setVideoLoading(false);
-              message.error('视频加载失败');
-            }}
+            onError={handleError}
             ref={videoRef}
             className={Styles.cameraVideo}
             autoPlay={true}
@@ -97,27 +139,23 @@ const CameraInfo: FC<{
       )}
 
       <Descriptions column={1} size="small" className={Styles.cameraDesc}>
-        <Descriptions.Item label="名称">
-          {props?.data?.cameraName}
-        </Descriptions.Item>
+        <Descriptions.Item label="名称">{data?.cameraName}</Descriptions.Item>
         <Descriptions.Item label="坐标">
-          纬度：{props.data?.latlng[0]} <br />
-          经度：{props?.data?.latlng[1]}
+          纬度：{data?.latlng[0]} <br />
+          经度：{data?.latlng[1]}
         </Descriptions.Item>
-        <Descriptions.Item label="型号">
-          {props?.data?.cameraModel}
-        </Descriptions.Item>
+        <Descriptions.Item label="型号">{data?.cameraModel}</Descriptions.Item>
         <Descriptions.Item label="状态">
-          {props?.data?.cameraStatus === constants.cameraStatus.NORMAL ? (
+          {data?.cameraStatus === constants.cameraStatus.NORMAL ? (
             <Badge status="success" text="正常" />
-          ) : props?.data?.cameraStatus === constants.cameraStatus.OFFLINE ? (
+          ) : data?.cameraStatus === constants.cameraStatus.OFFLINE ? (
             <Badge status="default" text="离线" />
           ) : (
             <Badge status="error" text="报警" />
           )}
         </Descriptions.Item>
         <Descriptions.Item label="报警规则">
-          {props?.data?.alarmRules}
+          {data?.alarmRules}
         </Descriptions.Item>
       </Descriptions>
       <Descriptions
@@ -131,7 +169,7 @@ const CameraInfo: FC<{
             pagination={{ pageSize: 5 }}
             size="small"
             columns={tableColumns}
-            dataSource={props.data?.alarmEvents}
+            dataSource={data?.alarmEvents}
             showHeader={false}
             rowKey="eventID"
             className={Styles.alarmEventsTable}

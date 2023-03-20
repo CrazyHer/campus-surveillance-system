@@ -24,18 +24,61 @@ export default interface ServiceTypes {
           cameraName: string;
           cameraID: number;
           cameraStatus: 'normal' | 'offline' | 'alarm';
-          hlsUrl: string;
           latlng: [number, number];
-          cameraModel: string;
-          alarmRules: string;
-          alarmEvents: {
-            eventID: number;
-            alarmTime: string;
-            alarmType: string;
-            alarmStatus: 'solved' | 'pending';
-          }[];
         }[];
       };
+    };
+  };
+  'GET /api/getCameraInfo': {
+    req: { cameraID: number };
+    res: {
+      data: {
+        cameraName: string;
+        cameraID: number;
+        cameraStatus: 'normal' | 'offline' | 'alarm';
+        hlsUrl: string;
+        latlng: [number, number];
+        cameraModel: string;
+        alarmRules: string;
+        alarmEvents: {
+          eventID: number;
+          alarmTime: string;
+          alarmType: string;
+          alarmStatus: 'solved' | 'pending';
+        }[];
+      };
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/resolveAlarm': {
+    req: { eventID: number };
+    res: { success: boolean; message: string; data: {} };
+  };
+  'GET /api/getAlarmEvents': {
+    req: {
+      cameraID: number;
+    };
+    res: {
+      data: {
+        eventID: number;
+        alarmTime: string;
+        alarmType: string;
+        alarmStatus: 'solved' | 'pending';
+      }[];
+      message: string;
+      success: boolean;
+    };
+  };
+  'GET /api/getMonitList': {
+    req: void;
+    res: {
+      data: {
+        cameraName: string;
+        cameraID: number;
+        cameraStatus: 'normal' | 'offline' | 'alarm';
+        hlsUrl: string;
+      }[];
     };
   };
 }

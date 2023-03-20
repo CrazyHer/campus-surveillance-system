@@ -50,22 +50,6 @@ const CampusState: FC = () => {
     fetchCampusState();
   }, []);
 
-  const [cameraInfoData, setCameraInfoData] =
-    useState<
-      ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0]
-    >();
-  const [showCameraInfo, setShowCameraInfo] = useState(false);
-  useEffect(() => {
-    if (data?.cameraList && selectedCameraIds[0]) {
-      setCameraInfoData(
-        data.cameraList.find((item) => item.cameraID === selectedCameraIds[0]),
-      );
-      setShowCameraInfo(true);
-    } else {
-      setShowCameraInfo(false);
-    }
-  }, [selectedCameraIds]);
-
   return (
     <Spin spinning={loading}>
       <div>
@@ -87,12 +71,10 @@ const CampusState: FC = () => {
           />
         </div>
 
-        <div
-          className={`${Styles.rightPanel} ${
-            showCameraInfo ? '' : Styles.hide
-          }`}
-        >
-          {showCameraInfo && <CameraInfo data={cameraInfoData} />}
+        <div className={Styles.rightPanel}>
+          {selectedCameraIds.length > 0 && (
+            <CameraInfo cameraID={selectedCameraIds[0]} />
+          )}
         </div>
       </div>
     </Spin>
