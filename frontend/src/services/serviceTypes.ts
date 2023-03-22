@@ -57,7 +57,7 @@ export default interface ServiceTypes {
   };
   'GET /api/getAlarmEvents': {
     req: {
-      cameraID: number;
+      cameraID?: number;
     };
     res: {
       data: {
@@ -65,6 +65,11 @@ export default interface ServiceTypes {
         alarmTime: string;
         alarmType: string;
         alarmStatus: 'solved' | 'pending';
+        cameraID: number;
+        cameraName: string;
+        cameraLatlng: [number, number];
+        cameraModel: string;
+        alarmPicUrl: string;
       }[];
       message: string;
       success: boolean;

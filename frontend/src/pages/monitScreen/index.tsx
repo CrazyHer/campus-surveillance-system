@@ -11,6 +11,7 @@ const MonitScreen: FC<{}> = () => {
     ServiceTypes['GET /api/getMonitList']['res']['data']
   >([]);
   const [loading, setLoading] = useState(false);
+  const [update, setUpdate] = useState(false);
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -30,7 +31,7 @@ const MonitScreen: FC<{}> = () => {
     // init video
     data.forEach((item) => {
       const videoRef = videosRef.current?.get(item.cameraID);
-      if (videoRef) {
+      if (videoRef && !videoRef.src) {
         if (videoRef.canPlayType('application/vnd.apple.mpegurl')) {
           videoRef.src = item.hlsUrl;
         } else if (hls.isSupported()) {
@@ -42,7 +43,7 @@ const MonitScreen: FC<{}> = () => {
         }
       }
     });
-  }, [data]);
+  }, [data, update]);
 
   return (
     <div className={Styles.content}>
@@ -50,7 +51,17 @@ const MonitScreen: FC<{}> = () => {
         loading={loading}
         grid={{ column: 3, gutter: 16 }}
         dataSource={data}
-        pagination={{ pageSize: 9, size: 'small' }}
+        pagination={{
+          defaultPageSize: 6,
+          size: 'small',
+          position: 'bottom',
+          align: 'center',
+          pageSizeOptions: [6, 12, 18, 24],
+          showSizeChanger: true,
+          showTotal: (total) => `共 ${total} 条`,
+          onChange: () => setUpdate(!update),
+          hideOnSinglePage: true,
+        }}
         renderItem={(item) => (
           <List.Item>
             <Card

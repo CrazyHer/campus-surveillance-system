@@ -7,6 +7,7 @@ import Styles from './index.module.less';
 import { ColumnType } from 'antd/es/table';
 import constants from '@/constants';
 import services from '@/services';
+import CameraStatusBadge from '@/components/cameraStatusBadge';
 const CameraInfo: FC<{
   cameraID: number;
 }> = (props) => {
@@ -110,7 +111,7 @@ const CameraInfo: FC<{
         setVideoLoading(false);
       }
     }
-  }, [data?.hlsUrl, videoRef.current]);
+  }, [data?.hlsUrl]);
 
   const handleError = () => {
     setVideoLoading(false);
@@ -146,13 +147,7 @@ const CameraInfo: FC<{
         </Descriptions.Item>
         <Descriptions.Item label="型号">{data?.cameraModel}</Descriptions.Item>
         <Descriptions.Item label="状态">
-          {data?.cameraStatus === constants.cameraStatus.NORMAL ? (
-            <Badge status="success" text="正常" />
-          ) : data?.cameraStatus === constants.cameraStatus.OFFLINE ? (
-            <Badge status="default" text="离线" />
-          ) : (
-            <Badge status="error" text="报警" />
-          )}
+          <CameraStatusBadge status={data?.cameraStatus} />
         </Descriptions.Item>
         <Descriptions.Item label="报警规则">
           {data?.alarmRules}

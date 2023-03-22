@@ -1,3 +1,4 @@
+import CameraStatusBadge from '@/components/cameraStatusBadge';
 import constants from '@/constants';
 import ServiceTypes from '@/services/serviceTypes';
 import { Badge, Button, Card, Table } from 'antd';
@@ -16,14 +17,9 @@ const CameraList: FC<{
     {
       title: '状态',
       dataIndex: 'cameraStatus',
-      render: (_value, record) =>
-        record.cameraStatus === constants.cameraStatus.NORMAL ? (
-          <Badge status="success" text="正常" />
-        ) : record.cameraStatus === constants.cameraStatus.OFFLINE ? (
-          <Badge status="default" text="离线" />
-        ) : (
-          <Badge status="error" text="报警" />
-        ),
+      render: (_value, record) => (
+        <CameraStatusBadge status={record.cameraStatus} />
+      ),
     },
     {
       title: '操作',

@@ -10,6 +10,7 @@ export default defineConfig({
       component: '@/pages/campusState',
     },
     { path: '/monitScreen', component: '@/pages/monitScreen' },
+    { path: '/alarms', component: '@/pages/alarms' },
   ],
   clientLoader: {},
   npmClient: 'pnpm',
