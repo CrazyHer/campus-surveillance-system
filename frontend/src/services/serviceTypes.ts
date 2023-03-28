@@ -26,6 +26,26 @@ export default interface ServiceTypes {
           cameraStatus: 'normal' | 'offline' | 'alarm';
           latlng: [number, number];
         }[];
+        mapConfig: {
+          mapOptions: {
+            center: [number, number];
+            zoom: number;
+            minZoom: number;
+            maxZoom: number;
+            attributionControl: boolean;
+            zoomControl: boolean;
+          };
+          layer:
+            | {
+                type: 'imageOverlay';
+                url: string;
+                bounds: [[number, number], [number, number]];
+              }
+            | {
+                type: 'tileLayer';
+                url: string;
+              };
+        };
       };
     };
   };
@@ -84,6 +104,98 @@ export default interface ServiceTypes {
         cameraStatus: 'normal' | 'offline' | 'alarm';
         hlsUrl: string;
       }[];
+    };
+  };
+  'GET /api/getUserInfo': {
+    req: void;
+    res: {
+      data: {
+        username: string;
+        role: 'admin' | 'user';
+        avatarURL: string;
+        tel: string;
+        email: string;
+      };
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/updateUserInfo': {
+    req: {
+      username: string;
+      avatarURL: string;
+      tel: string;
+      email: string;
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/updatePassword': {
+    req: {
+      oldPassword: string;
+      newPassword: string;
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'GET /api/getMapConfig': {
+    req: void;
+    res: {
+      data: {
+        mapOptions: {
+          center: [number, number];
+          zoom: number;
+          minZoom: number;
+          maxZoom: number;
+          attributionControl: boolean;
+          zoomControl: boolean;
+        };
+        layer:
+          | {
+              type: 'imageOverlay';
+              url: string;
+              bounds: [[number, number], [number, number]];
+            }
+          | {
+              type: 'tileLayer';
+              url: string;
+            };
+      };
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/updateMapConfig': {
+    req: {
+      mapOptions: {
+        center: [number, number];
+        zoom: number;
+        minZoom: number;
+        maxZoom: number;
+        attributionControl: boolean;
+        zoomControl: boolean;
+      };
+      layer:
+        | {
+            type: 'imageOverlay';
+            url: string;
+            bounds: [[number, number], [number, number]];
+          }
+        | {
+            type: 'tileLayer';
+            url: string;
+          };
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
     };
   };
 }

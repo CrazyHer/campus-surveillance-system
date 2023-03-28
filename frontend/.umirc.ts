@@ -11,6 +11,8 @@ export default defineConfig({
     },
     { path: '/monitScreen', component: '@/pages/monitScreen' },
     { path: '/alarms', component: '@/pages/alarms' },
+    { path: '/userInfo', component: '@/pages/userInfo' },
+    { path: '/admin/mapManage', component: '@/pages/admin/mapManage' },
   ],
   clientLoader: {},
   npmClient: 'pnpm',

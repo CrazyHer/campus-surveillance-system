@@ -39,46 +39,31 @@ export const createCameraIcon = (
 
 const CampusMap: FC<{
   cameraList?: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'];
-  onCameraSelect: (
+  onCameraSelect?: (
     currentCameraId: number,
     cameraInfo: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0],
   ) => any;
-  selectedCameraIds: number[];
-  className: string;
+  selectedCameraIds?: number[];
+  className?: string;
+  mapConfig?: leaflet.MapOptions;
+  onInit?: (map: leaflet.Map) => any;
 }> = (props) => {
   const mapDivRef = useRef<HTMLDivElement>(null);
   const mapObjRef = useRef<leaflet.Map>();
   const markersRef = useRef<leaflet.LayerGroup<leaflet.Marker>>();
-  const selectedCameraIdsRef = useRef<number[]>(props.selectedCameraIds);
+  const selectedCameraIdsRef = useRef<number[]>(props.selectedCameraIds || []);
   const onCameraSelectRef = useRef(props.onCameraSelect);
 
   useEffect(() => {
     // init map
     if (mapDivRef.current) {
-      mapObjRef.current = new leaflet.Map(mapDivRef.current, {
-        attributionControl: false,
-        center: [36.66669, 117.13272],
-        zoom: 17,
-        minZoom: 17,
-        maxZoom: 17,
-        zoomControl: false,
-        layers: [
-          new leaflet.TileLayer(
-            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            {
-              minZoom: 17,
-              maxZoom: 17,
-              attribution:
-                'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
-            },
-          ),
-        ],
-      });
+      mapObjRef.current = new leaflet.Map(mapDivRef.current, props.mapConfig);
+      props.onInit?.(mapObjRef.current);
       return () => {
         mapObjRef.current?.remove();
       };
     }
-  }, []);
+  }, [props.mapConfig]);
 
   useEffect(() => {
     onCameraSelectRef.current = props.onCameraSelect;
@@ -100,7 +85,7 @@ const CampusMap: FC<{
           .bindTooltip(camera.cameraName);
 
         marker.on('click', () => {
-          onCameraSelectRef.current(camera.cameraID, camera);
+          onCameraSelectRef.current?.(camera.cameraID, camera);
         });
         markersRef.current && marker.addTo(markersRef.current);
       });
@@ -109,10 +94,11 @@ const CampusMap: FC<{
         markersRef.current?.remove();
       };
     }
-  }, [props.cameraList]);
+  }, [props.cameraList, mapObjRef.current]);
 
   useEffect(() => {
     // sync selectedCameraIds with props, and update selected camera icon
+    if (!props.selectedCameraIds) return;
     selectedCameraIdsRef.current = props.selectedCameraIds;
     markersRef.current?.eachLayer((marker) => {
       const theCamera: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0] =
@@ -128,7 +114,7 @@ const CampusMap: FC<{
         mapObjRef.current?.setView(theCamera.latlng);
       }
     });
-  }, [props.selectedCameraIds]);
+  }, [props.selectedCameraIds, mapObjRef.current]);
 
   return <div ref={mapDivRef} className={props.className} />;
 };

@@ -28,6 +28,7 @@ const MonitScreen: FC<{}> = () => {
   }, []);
 
   useEffect(() => {
+    const disposeFuncs: (() => void)[] = [];
     // init video
     data.forEach((item) => {
       const videoRef = videosRef.current?.get(item.cameraID);
@@ -38,11 +39,18 @@ const MonitScreen: FC<{}> = () => {
           const hlsPlayer = new hls({ lowLatencyMode: true });
           hlsPlayer.loadSource(item.hlsUrl);
           hlsPlayer.attachMedia(videoRef);
+          disposeFuncs.push(() => {
+            hlsPlayer.detachMedia();
+            hlsPlayer.destroy();
+          });
         } else {
           videoRef.innerText = '您的浏览器不支持查看摄像头视频';
         }
       }
     });
+    return () => {
+      disposeFuncs.forEach((func) => func());
+    };
   }, [data, update]);
 
   return (

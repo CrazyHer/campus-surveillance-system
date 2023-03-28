@@ -24,7 +24,7 @@ const Layout: FC = () => {
             label: '系统管理',
             key: '/admin',
             children: [
-              { label: '园区地图管理', key: '/admin/campusMap' },
+              { label: '园区地图管理', key: '/admin/mapManage' },
               { label: '摄像头管理', key: '/admin/cameras' },
               { label: '报警规则配置', key: '/admin/alarmRules' },
               { label: '系统用户管理', key: '/admin/users' },
@@ -53,9 +53,7 @@ const Layout: FC = () => {
   };
   return (
     <AccessAuth>
-      <AntdLayout
-        style={{ position: 'absolute', height: '100%', width: '100%' }}
-      >
+      <AntdLayout style={{ position: 'fixed', height: '100%', width: '100%' }}>
         <AntdLayout.Header className={Style.header}>
           <div className={Style.title}>
             <img src={sduIcon} alt="LOGO" />

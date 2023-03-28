@@ -106,12 +106,16 @@ const CameraInfo: FC<{
         const hlsPlayer = new hls({ lowLatencyMode: true });
         hlsPlayer.loadSource(data.hlsUrl);
         hlsPlayer.attachMedia(videoRef.current);
+        return () => {
+          hlsPlayer.detachMedia();
+          hlsPlayer.destroy();
+        };
       } else {
         videoRef.current.innerText = '您的浏览器不支持查看摄像头视频';
         setVideoLoading(false);
       }
     }
-  }, [data?.hlsUrl]);
+  }, [data]);
 
   const handleError = () => {
     setVideoLoading(false);

@@ -41,6 +41,20 @@ export default {
           latlng: [36.666747708247264, 117.13250652184426],
         },
       ],
+      mapConfig: {
+        mapOptions: {
+          attributionControl: false,
+          center: [36.66669, 117.13272],
+          zoom: 17,
+          minZoom: 17,
+          maxZoom: 17,
+          zoomControl: false,
+        },
+        layer: {
+          type: 'tileLayer',
+          url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        },
+      },
     },
     message: '',
     success: true,
@@ -140,6 +154,51 @@ export default {
         hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
       },
     ],
+    message: '',
+    success: true,
+  },
+  'GET /api/getUserInfo': {
+    data: {
+      avatarURL:
+        'https://himg.bdimg.com/sys/portrait/item/pp.1.2c68ba76.fN8DC9UiXh1lKjACEyEBTg.jpg',
+      username: 'admin',
+      role: constants.userRole.ADMIN,
+      tel: '12345678901',
+      email: '123@mail.com',
+    },
+    message: '',
+    success: true,
+  },
+  'POST /api/updateUserInfo': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'POST /api/updatePassword': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'GET /api/getMapConfig': {
+    data: {
+      mapOptions: {
+        attributionControl: false,
+        center: [36.66669, 117.13272],
+        zoom: 17,
+        minZoom: 17,
+        maxZoom: 17,
+        zoomControl: false,
+      },
+      layer: {
+        type: 'tileLayer',
+        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      },
+    },
+    message: '',
+    success: true,
+  },
+  'POST /api/updateMapConfig': {
+    data: {},
     message: '',
     success: true,
   },
