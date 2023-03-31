@@ -6,10 +6,13 @@ const fetchData = async (api: string, data: any): Promise<any> => {
   const Authorization = mobxStore.user.getToken();
   let res: Response;
   if (method === 'GET') {
-    res = await fetch(`${url}?${new URLSearchParams(data as any).toString()}`, {
-      headers: { Authorization },
-      method,
-    });
+    res = await fetch(
+      `${url}${data ? '?' + new URLSearchParams(data as any).toString() : ''}`,
+      {
+        headers: { Authorization },
+        method,
+      },
+    );
   } else {
     res = await fetch(url, {
       headers: { Authorization },

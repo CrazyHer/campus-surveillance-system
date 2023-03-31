@@ -2,14 +2,13 @@ import services from '@/services';
 import ServiceTypes from '@/services/serviceTypes';
 import { message, Spin } from 'antd';
 import { observer } from 'mobx-react';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import CameraInfo from './cameraInfo';
 import CameraList from './cameraList';
 import CampusMap from '../../components/campusMap';
 import Styles from './index.module.less';
 import StatusHeader from './statusHeader';
-import { CRS, ImageOverlay, MapOptions, TileLayer } from 'leaflet';
-import constants from '@/constants';
+import mobxStore from '@/mobxStore';
 
 const CampusState: FC = () => {
   const [loading, setLoading] = useState(false);
@@ -53,37 +52,15 @@ const CampusState: FC = () => {
     fetchCampusState();
   }, []);
 
-  const mapConfig = useMemo<MapOptions>(
-    () =>
-      data?.mapConfig
-        ? {
-            ...data.mapConfig.mapOptions,
-            crs:
-              data.mapConfig.layer.type === 'tileLayer'
-                ? CRS.EPSG3857
-                : CRS.Simple,
-            layers: [
-              data.mapConfig.layer.type === 'tileLayer'
-                ? new TileLayer(data.mapConfig.layer.url)
-                : new ImageOverlay(
-                    data.mapConfig.layer.url,
-                    data.mapConfig.layer.bounds,
-                  ),
-            ],
-          }
-        : {},
-    [data],
-  );
-
   return (
     <Spin spinning={loading}>
       <div>
         <CampusMap
           className={Styles.map}
           cameraList={data?.cameraList}
-          onCameraSelect={handleSelectCamera}
+          onCameraClick={handleSelectCamera}
           selectedCameraIds={selectedCameraIds}
-          mapConfig={mapConfig}
+          mapConfig={mobxStore.mapConfig.config}
         />
 
         <div className={Styles.topPanel}>

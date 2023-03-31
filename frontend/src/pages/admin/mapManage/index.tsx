@@ -1,11 +1,10 @@
 import CampusMap from '@/components/campusMap';
+import mobxStore from '@/mobxStore';
 import services from '@/services';
-import ServiceTypes from '@/services/serviceTypes';
 import { UploadOutlined } from '@ant-design/icons';
 import {
   Button,
   Card,
-  Descriptions,
   Form,
   Input,
   InputNumber,
@@ -19,7 +18,7 @@ import {
 import { FormProps, useForm, useWatch } from 'antd/es/form/Form';
 import { CRS, ImageOverlay, MapOptions, TileLayer } from 'leaflet';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import Styles from './index.module.less';
 
 const getBase64 = (file: File): Promise<string> =>
@@ -99,12 +98,10 @@ const MapManage: FC = () => {
     }
   };
 
-  const fetchConfigData = async () => {
+  const fetchAndInitData = async () => {
     try {
       setFetchLoading(true);
-      const data: ServiceTypes['GET /api/getMapConfig']['res']['data'] = (
-        await services['GET /api/getMapConfig']()
-      ).data;
+      const data = await mobxStore.mapConfig.fetchAndSetMapConfig();
 
       if (data.layer.type === 'imageOverlay') {
         const formData: IFormData = {
@@ -147,7 +144,7 @@ const MapManage: FC = () => {
   };
 
   useEffect(() => {
-    fetchConfigData();
+    fetchAndInitData();
   }, []);
 
   const handleSubmit = async (formData: IFormData) => {
@@ -196,7 +193,7 @@ const MapManage: FC = () => {
         });
       }
       message.success('保存成功');
-      fetchConfigData();
+      fetchAndInitData();
     } catch (error) {
       console.error(error);
       message.error(String(error));
@@ -212,7 +209,7 @@ const MapManage: FC = () => {
 
   const handleReset: FormProps['onReset'] = (e) => {
     e?.preventDefault();
-    fetchConfigData();
+    fetchAndInitData();
   };
 
   return (
@@ -369,7 +366,11 @@ const MapManage: FC = () => {
 
             <Form.Item>
               <Space>
-                <Button type="primary" htmlType="submit">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={submitLoading}
+                >
                   保存
                 </Button>
                 <Button

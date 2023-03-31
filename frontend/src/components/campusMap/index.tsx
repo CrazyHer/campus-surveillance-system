@@ -39,7 +39,7 @@ export const createCameraIcon = (
 
 const CampusMap: FC<{
   cameraList?: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'];
-  onCameraSelect?: (
+  onCameraClick?: (
     currentCameraId: number,
     cameraInfo: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0],
   ) => any;
@@ -52,7 +52,7 @@ const CampusMap: FC<{
   const mapObjRef = useRef<leaflet.Map>();
   const markersRef = useRef<leaflet.LayerGroup<leaflet.Marker>>();
   const selectedCameraIdsRef = useRef<number[]>(props.selectedCameraIds || []);
-  const onCameraSelectRef = useRef(props.onCameraSelect);
+  const onCameraSelectRef = useRef(props.onCameraClick);
 
   useEffect(() => {
     // init map
@@ -66,8 +66,8 @@ const CampusMap: FC<{
   }, [props.mapConfig]);
 
   useEffect(() => {
-    onCameraSelectRef.current = props.onCameraSelect;
-  }, [props.onCameraSelect]);
+    onCameraSelectRef.current = props.onCameraClick;
+  }, [props.onCameraClick]);
 
   useEffect(() => {
     // render camera markers

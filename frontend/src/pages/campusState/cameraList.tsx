@@ -1,7 +1,6 @@
 import CameraStatusBadge from '@/components/cameraStatusBadge';
-import constants from '@/constants';
 import ServiceTypes from '@/services/serviceTypes';
-import { Badge, Button, Card, Table } from 'antd';
+import { Button, Card, Table } from 'antd';
 import { ColumnType } from 'antd/es/table';
 import { observer } from 'mobx-react';
 import { FC } from 'react';

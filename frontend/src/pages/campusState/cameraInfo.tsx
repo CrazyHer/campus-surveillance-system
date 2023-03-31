@@ -2,7 +2,7 @@ import ServiceTypes from '@/services/serviceTypes';
 import { observer } from 'mobx-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import hls from 'hls.js';
-import { Badge, Button, Card, Descriptions, message, Spin, Table } from 'antd';
+import { Button, Card, Descriptions, message, Spin, Table, Tag } from 'antd';
 import Styles from './index.module.less';
 import { ColumnType } from 'antd/es/table';
 import constants from '@/constants';
@@ -65,12 +65,11 @@ const CameraInfo: FC<{
     },
     {
       title: '报警类型',
-      dataIndex: 'alarmType',
-      render: (value, record) =>
+      render: (_v, record) =>
         record.alarmStatus === constants.alarmStatus.PENDING ? (
-          <div style={{ color: 'red' }}>{value}</div>
+          <div style={{ color: 'red' }}>{record.alarmRule.alarmRuleName}</div>
         ) : (
-          <div>{value}</div>
+          <div>{record.alarmRule.alarmRuleName}</div>
         ),
     },
     {
@@ -154,7 +153,9 @@ const CameraInfo: FC<{
           <CameraStatusBadge status={data?.cameraStatus} />
         </Descriptions.Item>
         <Descriptions.Item label="报警规则">
-          {data?.alarmRules}
+          {data?.alarmRules.map((rule) => (
+            <Tag key={rule.alarmRuleID}>{rule.alarmRuleName}</Tag>
+          ))}
         </Descriptions.Item>
       </Descriptions>
       <Descriptions

@@ -130,7 +130,7 @@ const Alarms: FC = () => {
               {modalContext.eventID}
             </Descriptions.Item>
             <Descriptions.Item label="报警类型">
-              {modalContext.alarmType}
+              {modalContext.alarmRule.alarmRuleName}
             </Descriptions.Item>
             <Descriptions.Item label="报警时间">
               {modalContext.alarmTime}

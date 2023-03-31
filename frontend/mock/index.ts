@@ -71,19 +71,32 @@ export default {
       cameraStatus: 'normal',
       latlng: [36.666394717516695, 117.13263524798919],
       cameraModel: '摄像头型号1',
-      alarmRules: '报警规则1',
+      alarmRules: [
+        {
+          alarmRuleID: 1,
+          alarmRuleName: '报警规则1',
+        },
+        {
+          alarmRuleID: 2,
+          alarmRuleName: '报警规则2',
+        },
+        {
+          alarmRuleID: 3,
+          alarmRuleName: '报警规则3',
+        },
+      ],
       hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
       alarmEvents: [
         {
           eventID: 1,
           alarmTime: '2020-01-01 00:00:00',
-          alarmType: '人脸报警',
+          alarmRule: { alarmRuleID: 1, alarmRuleName: '报警规则1' },
           alarmStatus: 'pending',
         },
         {
           eventID: 2,
           alarmTime: '2020-01-01 00:00:00',
-          alarmType: '人脸报警',
+          alarmRule: { alarmRuleID: 1, alarmRuleName: '报警规则1' },
           alarmStatus: 'pending',
         },
       ],
@@ -96,7 +109,7 @@ export default {
       {
         eventID: 1,
         alarmTime: '2020-01-01 00:00:00',
-        alarmType: '人脸报警',
+        alarmRule: { alarmRuleID: 1, alarmRuleName: '报警规则1' },
         alarmStatus: 'pending',
         cameraID: 1,
         cameraName: '摄像头1',
@@ -108,7 +121,7 @@ export default {
       {
         eventID: 2,
         alarmTime: '2020-01-01 00:00:00',
-        alarmType: '人脸报警',
+        alarmRule: { alarmRuleID: 2, alarmRuleName: '报警规则2' },
         alarmStatus: 'solved',
         cameraID: 1,
         cameraName: '摄像头1',
@@ -199,6 +212,72 @@ export default {
   },
   'POST /api/updateMapConfig': {
     data: {},
+    message: '',
+    success: true,
+  },
+  'GET /api/getCameraList': {
+    data: [
+      {
+        cameraName: '摄像头1',
+        cameraID: 1,
+        cameraStatus: 'normal',
+        latlng: [36.666394717516695, 117.13263524798919],
+        cameraModel: '摄像头型号1',
+        alarmRules: [{ alarmRuleID: 1, alarmRuleName: '报警规则1' }],
+        hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
+      },
+      {
+        cameraName: '摄像头2',
+        cameraID: 2,
+        cameraStatus: 'offline',
+        latlng: [36.66553375772535, 117.13452323144844],
+        cameraModel: '摄像头型号2',
+        alarmRules: [{ alarmRuleID: 2, alarmRuleName: '报警规则2' }],
+        hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
+      },
+      {
+        cameraName: '摄像头3',
+        cameraID: 3,
+        cameraStatus: 'alarm',
+        latlng: [36.666747708247264, 117.13250652184426],
+        cameraModel: '摄像头型号3',
+        alarmRules: [{ alarmRuleID: 3, alarmRuleName: '报警规则3' }],
+        hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
+      },
+    ],
+    message: '',
+    success: true,
+  },
+  'POST /api/addCamera': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'POST /api/updateCamera': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'POST /api/deleteCamera': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'GET /api/getAlarmRuleList': {
+    data: [
+      {
+        alarmRuleID: 1,
+        alarmRuleName: '报警规则1',
+      },
+      {
+        alarmRuleID: 2,
+        alarmRuleName: '报警规则2',
+      },
+      {
+        alarmRuleID: 3,
+        alarmRuleName: '报警规则3',
+      },
+    ],
     message: '',
     success: true,
   },

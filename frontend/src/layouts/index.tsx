@@ -25,9 +25,9 @@ const Layout: FC = () => {
             key: '/admin',
             children: [
               { label: '园区地图管理', key: '/admin/mapManage' },
-              { label: '摄像头管理', key: '/admin/cameras' },
-              { label: '报警规则配置', key: '/admin/alarmRules' },
-              { label: '系统用户管理', key: '/admin/users' },
+              { label: '摄像头管理', key: '/admin/camerasManage' },
+              { label: '报警规则配置', key: '/admin/alarmRulesManage' },
+              { label: '系统用户管理', key: '/admin/usersManage' },
             ],
           }
         : null,

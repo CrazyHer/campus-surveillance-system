@@ -13,6 +13,13 @@ export default defineConfig({
     { path: '/alarms', component: '@/pages/alarms' },
     { path: '/userInfo', component: '@/pages/userInfo' },
     { path: '/admin/mapManage', component: '@/pages/admin/mapManage' },
+    { path: '/admin/camerasManage', component: '@/pages/admin/camerasManage' },
+    {
+      path: '/admin/alarmRulesManage',
+      component: '@/pages/admin/alarmRulesManage',
+    },
+    { path: '/admin/usersManage', component: '@/pages/admin/usersManage' },
+    { paht: '/*', redirect: '/' },
   ],
   clientLoader: {},
   npmClient: 'pnpm',

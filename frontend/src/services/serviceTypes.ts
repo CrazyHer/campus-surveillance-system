@@ -1,3 +1,24 @@
+export interface AlarmRuleBase {
+  alarmRuleID: number;
+  alarmRuleName: string;
+}
+
+export interface AlarmRuleFull extends AlarmRuleBase {
+  relatedCameraIDs: number[];
+  status: 'enabled' | 'disabled';
+  algorithmType: 'body' | 'vehicle';
+  triggerCondition: {
+    time: {
+      dayOfWeek: number[];
+      timeRange: [string, string];
+    };
+    count: {
+      min: number;
+      max: number;
+    };
+  };
+}
+
 export default interface ServiceTypes {
   'POST /api/login': {
     req: { username: string; password: string };
@@ -59,11 +80,11 @@ export default interface ServiceTypes {
         hlsUrl: string;
         latlng: [number, number];
         cameraModel: string;
-        alarmRules: string;
+        alarmRules: AlarmRuleBase[];
         alarmEvents: {
           eventID: number;
           alarmTime: string;
-          alarmType: string;
+          alarmRule: AlarmRuleBase;
           alarmStatus: 'solved' | 'pending';
         }[];
       };
@@ -83,7 +104,7 @@ export default interface ServiceTypes {
       data: {
         eventID: number;
         alarmTime: string;
-        alarmType: string;
+        alarmRule: AlarmRuleBase;
         alarmStatus: 'solved' | 'pending';
         cameraID: number;
         cameraName: string;
@@ -191,6 +212,95 @@ export default interface ServiceTypes {
             type: 'tileLayer';
             url: string;
           };
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'GET /api/getCameraList': {
+    req: void;
+    res: {
+      data: {
+        cameraName: string;
+        cameraID: number;
+        cameraStatus: 'normal' | 'offline' | 'alarm';
+        hlsUrl: string;
+        latlng: [number, number];
+        cameraModel: string;
+        alarmRules: AlarmRuleBase[];
+      }[];
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/addCamera': {
+    req: {
+      cameraName: string;
+      hlsUrl: string;
+      latlng: [number, number];
+      cameraModel: string;
+      alarmRuleIDs: number[];
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/updateCamera': {
+    req: {
+      cameraID: number;
+      cameraName: string;
+      hlsUrl: string;
+      latlng: [number, number];
+      cameraModel: string;
+      alarmRuleIDs: number[];
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/deleteCamera': {
+    req: {
+      cameraID: number;
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'GET /api/getAlarmRuleList': {
+    req: void;
+    res: {
+      data: AlarmRuleFull[];
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/addAlarmRule': {
+    req: Omit<AlarmRuleFull, 'alarmRuleID'>;
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/updateAlarmRule': {
+    req: AlarmRuleFull;
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/deleteAlarmRule': {
+    req: {
+      alarmRuleID: number;
     };
     res: {
       data: {};
