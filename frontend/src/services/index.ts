@@ -1,5 +1,6 @@
 import mobxStore from '@/mobxStore';
 import ServiceTypes from './serviceTypes';
+import constants from '@/constants';
 
 const fetchData = async (api: string, data: any): Promise<any> => {
   const [method, url] = api.split(' ');
@@ -7,7 +8,9 @@ const fetchData = async (api: string, data: any): Promise<any> => {
   let res: Response;
   if (method === 'GET') {
     res = await fetch(
-      `${url}${data ? '?' + new URLSearchParams(data as any).toString() : ''}`,
+      `${constants.FETCH_ROOT}${url}${
+        data ? '?' + new URLSearchParams(data as any).toString() : ''
+      }`,
       {
         headers: { Authorization },
         method,
