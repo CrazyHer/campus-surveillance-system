@@ -24,6 +24,7 @@ export interface AlarmRuleFull extends AlarmRuleBase {
 
 export interface UserInfo {
   username: string;
+  nickname: string;
   role: 'admin' | 'user';
   avatarURL: string;
   tel: string;
@@ -31,18 +32,18 @@ export interface UserInfo {
 }
 
 export default interface ServiceTypes {
-  'POST /api/login': {
+  'POST /api/user/login': {
     req: { username: string; password: string };
     res: {
       success: boolean;
       message: string;
       data: {
         token: string;
-        userInfo: { avatarURL: string; username: string; role: string };
+        userInfo: UserInfo;
       };
     };
   };
-  'GET /api/getCampusState': {
+  'GET /api/user/getCampusState': {
     req: void;
     res: {
       success: boolean;
@@ -81,7 +82,7 @@ export default interface ServiceTypes {
       };
     };
   };
-  'GET /api/getCameraInfo': {
+  'GET /api/user/getCameraInfo': {
     req: { cameraID: number };
     res: {
       data: {
@@ -103,11 +104,11 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/resolveAlarm': {
+  'POST /api/user/resolveAlarm': {
     req: { eventID: number };
     res: { success: boolean; message: string; data: {} };
   };
-  'GET /api/getAlarmEvents': {
+  'GET /api/user/getAlarmEvents': {
     req: {
       cameraID?: number;
     };
@@ -127,7 +128,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'GET /api/getMonitList': {
+  'GET /api/user/getMonitList': {
     req: void;
     res: {
       data: {
@@ -138,7 +139,7 @@ export default interface ServiceTypes {
       }[];
     };
   };
-  'GET /api/getUserInfo': {
+  'GET /api/user/getUserInfo': {
     req: void;
     res: {
       data: UserInfo;
@@ -146,7 +147,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/updateUserInfo': {
+  'POST /api/user/updateUserInfo': {
     req: Omit<UserInfo, 'role'>;
     res: {
       data: {};
@@ -154,7 +155,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/updatePassword': {
+  'POST /api/user/updatePassword': {
     req: {
       oldPassword: string;
       newPassword: string;
@@ -165,7 +166,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'GET /api/getMapConfig': {
+  'GET /api/user/getMapConfig': {
     req: void;
     res: {
       data: {
@@ -192,7 +193,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/updateMapConfig': {
+  'POST /api/admin/updateMapConfig': {
     req: {
       mapOptions: {
         center: [number, number];
@@ -219,7 +220,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'GET /api/getCameraList': {
+  'GET /api/admin/getCameraList': {
     req: void;
     res: {
       data: {
@@ -235,10 +236,9 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/addCamera': {
+  'POST /api/admin/addCamera': {
     req: {
       cameraName: string;
-      hlsUrl: string;
       latlng: [number, number];
       cameraModel: string;
       alarmRuleIDs: number[];
@@ -249,11 +249,10 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/updateCamera': {
+  'POST /api/admin/updateCamera': {
     req: {
       cameraID: number;
       cameraName: string;
-      hlsUrl: string;
       latlng: [number, number];
       cameraModel: string;
       alarmRuleIDs: number[];
@@ -264,7 +263,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/deleteCamera': {
+  'POST /api/admin/deleteCamera': {
     req: {
       cameraID: number;
     };
@@ -274,7 +273,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'GET /api/getAlarmRuleList': {
+  'GET /api/admin/getAlarmRuleList': {
     req: void;
     res: {
       data: AlarmRuleFull[];
@@ -282,7 +281,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/addAlarmRule': {
+  'POST /api/admin/addAlarmRule': {
     req: Omit<AlarmRuleFull, 'alarmRuleID' | 'relatedCameras'> & {
       relatedCameraIds: number[];
     };
@@ -292,7 +291,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/updateAlarmRule': {
+  'POST /api/admin/updateAlarmRule': {
     req: Omit<AlarmRuleFull, 'relatedCameras'> & {
       relatedCameraIds: number[];
     };
@@ -302,7 +301,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/deleteAlarmRule': {
+  'POST /api/admin/deleteAlarmRule': {
     req: {
       alarmRuleID: number;
     };
@@ -312,7 +311,7 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'GET /api/getUserList': {
+  'GET /api/admin/getUserList': {
     req: void;
     res: {
       data: UserInfo[];
@@ -320,10 +319,11 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/addUser': {
+  'POST /api/admin/addUser': {
     req: {
       username: string;
       role: 'admin' | 'user';
+      nickname: string;
       tel?: string;
       email?: string;
       password: string;
@@ -334,15 +334,22 @@ export default interface ServiceTypes {
       success: boolean;
     };
   };
-  'POST /api/updateUser': {
-    req: UserInfo;
+  'POST /api/admin/updateUser': {
+    req: {
+      username: string;
+      role: 'admin' | 'user';
+      nickname: string;
+      tel?: string;
+      email?: string;
+      newPassword?: string;
+    };
     res: {
       data: {};
       message: string;
       success: boolean;
     };
   };
-  'POST /api/deleteUser': {
+  'POST /api/admin/deleteUser': {
     req: {
       username: string;
     };

@@ -1,6 +1,6 @@
 import services from '@/services';
 import { CRS, ImageOverlay, MapOptions, TileLayer } from 'leaflet';
-import { action, computed, get, makeAutoObservable } from 'mobx';
+import { action, makeAutoObservable } from 'mobx';
 
 class MapConfig {
   private _config: MapOptions | null = null;
@@ -33,7 +33,7 @@ class MapConfig {
   }
 
   async fetchAndSetMapConfig() {
-    const data = (await services['GET /api/getMapConfig']()).data;
+    const data = (await services['GET /api/user/getMapConfig']()).data;
     this.setConfig({
       ...data.mapOptions,
       crs: data.layer.type === 'tileLayer' ? CRS.EPSG3857 : CRS.Simple,

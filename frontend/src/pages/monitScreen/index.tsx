@@ -9,14 +9,14 @@ import constants from '@/constants';
 const MonitScreen: FC<{}> = () => {
   const videosRef = useRef<Map<number, HTMLVideoElement>>(new Map());
   const [data, setData] = useState<
-    ServiceTypes['GET /api/getMonitList']['res']['data']
+    ServiceTypes['GET /api/user/getMonitList']['res']['data']
   >([]);
   const [loading, setLoading] = useState(false);
   const [update, setUpdate] = useState(false);
   const fetchData = async () => {
     try {
       setLoading(true);
-      setData((await services['GET /api/getMonitList']()).data);
+      setData((await services['GET /api/user/getMonitList']()).data);
     } catch (error) {
       message.error(String(error));
       console.error(error);

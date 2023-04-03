@@ -3,7 +3,7 @@ import { Layout as AntdLayout, Menu, Dropdown, Avatar, MenuProps } from 'antd';
 import { observer } from 'mobx-react';
 import Style from './index.module.less';
 import { history, Outlet, useLocation } from 'umi';
-import sduIcon from '@/assets/filmIcon.svg';
+import brandIcon from '@/assets/icon.png';
 import mobxStore from '@/mobxStore';
 import constants from '@/constants';
 import { useFmtMsg } from '@/hooks/useFmtMsg';
@@ -56,7 +56,7 @@ const Layout: FC = () => {
       <AntdLayout style={{ position: 'fixed', height: '100%', width: '100%' }}>
         <AntdLayout.Header className={Style.header}>
           <div className={Style.title}>
-            <img src={sduIcon} alt="LOGO" />
+            <img src={brandIcon} alt="LOGO" />
             <h1>
               <b>{f('title')}</b>
             </h1>
@@ -76,7 +76,7 @@ const Layout: FC = () => {
                   icon={<img src={mobxStore.user.avatarURL} alt="头像" />}
                 />
                 <div className={Style['username']}>
-                  {mobxStore.user.username}
+                  {mobxStore.user.nickname}
                 </div>
               </div>
             </Dropdown>

@@ -2,20 +2,23 @@ import constants from '../src/constants';
 import ServiceTypes from '../src/services/serviceTypes';
 
 export default {
-  'POST /api/login': {
+  'POST /api/user/login': {
     data: {
       token: '123',
       userInfo: {
         avatarURL:
           'https://himg.bdimg.com/sys/portrait/item/pp.1.2c68ba76.fN8DC9UiXh1lKjACEyEBTg.jpg',
-        username: 'admin',
+        nickname: 'admin',
         role: constants.userRole.ADMIN,
+        tel: '12345678901',
+        email: '',
+        username: 'admin',
       },
     },
     message: '',
     success: true,
   },
-  'GET /api/getCampusState': {
+  'GET /api/user/getCampusState': {
     data: {
       cameraTotal: 20,
       cameraOnline: 10,
@@ -59,12 +62,12 @@ export default {
     message: '',
     success: true,
   },
-  'POST /api/resolveAlarm': {
+  'POST /api/user/resolveAlarm': {
     data: {},
     success: true,
     message: '',
   },
-  'GET /api/getCameraInfo': {
+  'GET /api/user/getCameraInfo': {
     data: {
       cameraName: '摄像头1',
       cameraID: 1,
@@ -104,7 +107,7 @@ export default {
     message: '',
     success: true,
   },
-  'GET /api/getAlarmEvents': {
+  'GET /api/user/getAlarmEvents': {
     data: [
       {
         eventID: 1,
@@ -134,7 +137,7 @@ export default {
     message: '',
     success: true,
   },
-  'GET /api/getMonitList': {
+  'GET /api/user/getMonitList': {
     data: [
       {
         cameraName: '摄像头1',
@@ -170,7 +173,7 @@ export default {
     message: '',
     success: true,
   },
-  'GET /api/getUserInfo': {
+  'GET /api/user/getUserInfo': {
     data: {
       avatarURL:
         'https://himg.bdimg.com/sys/portrait/item/pp.1.2c68ba76.fN8DC9UiXh1lKjACEyEBTg.jpg',
@@ -178,21 +181,22 @@ export default {
       role: constants.userRole.ADMIN,
       tel: '12345678901',
       email: '123@mail.com',
+      nickname: 'admin',
     },
     message: '',
     success: true,
   },
-  'POST /api/updateUserInfo': {
+  'POST /api/user/updateUserInfo': {
     data: {},
     message: '',
     success: true,
   },
-  'POST /api/updatePassword': {
+  'POST /api/user/updatePassword': {
     data: {},
     message: '',
     success: true,
   },
-  'GET /api/getMapConfig': {
+  'GET /api/user/getMapConfig': {
     data: {
       mapOptions: {
         attributionControl: false,
@@ -210,12 +214,12 @@ export default {
     message: '',
     success: true,
   },
-  'POST /api/updateMapConfig': {
+  'POST /api/admin/updateMapConfig': {
     data: {},
     message: '',
     success: true,
   },
-  'GET /api/getCameraList': {
+  'GET /api/admin/getCameraList': {
     data: [
       {
         cameraName: '摄像头1',
@@ -248,22 +252,22 @@ export default {
     message: '',
     success: true,
   },
-  'POST /api/addCamera': {
+  'POST /api/admin/addCamera': {
     data: {},
     message: '',
     success: true,
   },
-  'POST /api/updateCamera': {
+  'POST /api/admin/updateCamera': {
     data: {},
     message: '',
     success: true,
   },
-  'POST /api/deleteCamera': {
+  'POST /api/admin/deleteCamera': {
     data: {},
     message: '',
     success: true,
   },
-  'GET /api/getAlarmRuleList': {
+  'GET /api/admin/getAlarmRuleList': {
     data: [
       {
         alarmRuleID: 1,
@@ -311,28 +315,29 @@ export default {
     message: '',
     success: true,
   },
-  'POST /api/addAlarmRule': {
+  'POST /api/admin/addAlarmRule': {
     data: {},
     message: '',
     success: true,
   },
-  'POST /api/updateAlarmRule': {
+  'POST /api/admin/updateAlarmRule': {
     data: {},
     message: '',
     success: true,
   },
-  'POST /api/deleteAlarmRule': {
+  'POST /api/admin/deleteAlarmRule': {
     data: {},
     message: '',
     success: true,
   },
-  'GET /api/getUserList': {
+  'GET /api/admin/getUserList': {
     data: [
       {
         username: 'admin',
         role: 'admin',
         tel: '12345678901',
         email: '123@456.com',
+        nickname: 'admin1',
         avatarURL:
           'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
       },
@@ -341,6 +346,7 @@ export default {
         role: 'user',
         tel: '12345678901',
         email: '123@456.com',
+        nickname: 'admin2',
         avatarURL:
           'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
       },
@@ -348,17 +354,17 @@ export default {
     message: '',
     success: true,
   },
-  'POST /api/addUser': {
+  'POST /api/admin/addUser': {
     data: {},
     message: '',
     success: true,
   },
-  'POST /api/updateUser': {
+  'POST /api/admin/updateUser': {
     data: {},
     message: '',
     success: true,
   },
-  'POST /api/deleteUser': {
+  'POST /api/admin/deleteUser': {
     data: {},
     message: '',
     success: true,

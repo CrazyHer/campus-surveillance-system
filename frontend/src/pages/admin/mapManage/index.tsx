@@ -151,7 +151,7 @@ const MapManage: FC = () => {
     try {
       setSubmitLoading(true);
       if (formData.sourceType === 'osm') {
-        await services['POST /api/updateMapConfig']({
+        await services['POST /api/admin/updateMapConfig']({
           layer: {
             type: 'tileLayer',
             url: formData.sourceURL,
@@ -173,7 +173,7 @@ const MapManage: FC = () => {
           sourceURL = formData.sourceFile?.[0]?.url || '';
         }
 
-        await services['POST /api/updateMapConfig']({
+        await services['POST /api/admin/updateMapConfig']({
           layer: {
             type: 'imageOverlay',
             url: sourceURL,

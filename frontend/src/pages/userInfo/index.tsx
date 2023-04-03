@@ -6,7 +6,6 @@ import {
   Form,
   Input,
   message,
-  Modal,
   Spin,
   Upload,
   UploadProps,
@@ -29,9 +28,9 @@ const getBase64 = (file: File): Promise<string> => {
 
 const UserInfo: FC = () => {
   const [data, setData] =
-    useState<ServiceTypes['GET /api/getUserInfo']['res']['data']>();
+    useState<ServiceTypes['GET /api/user/getUserInfo']['res']['data']>();
   const [fetchLoading, setFetchLoading] = useState(false);
-  type UserInfoForm = ServiceTypes['GET /api/getUserInfo']['res']['data'];
+  type UserInfoForm = ServiceTypes['GET /api/user/getUserInfo']['res']['data'];
   const [userInfoForm] = useForm<UserInfoForm>();
 
   type PasswordForm = {
@@ -46,7 +45,7 @@ const UserInfo: FC = () => {
   const fetchData = async () => {
     try {
       setFetchLoading(true);
-      const res = await services['GET /api/getUserInfo']();
+      const res = await services['GET /api/user/getUserInfo']();
       setData(res.data);
       userInfoForm.setFieldsValue(res.data);
       setImgFileList([
@@ -78,7 +77,7 @@ const UserInfo: FC = () => {
         (imgFileList[0]?.originFileObj
           ? await getBase64(imgFileList[0].originFileObj)
           : data?.avatarURL) || '';
-      await services['POST /api/updateUserInfo']({
+      await services['POST /api/user/updateUserInfo']({
         ...values,
         avatarURL,
       });
@@ -92,7 +91,7 @@ const UserInfo: FC = () => {
 
   const handlePasswordSubmit = async (values: PasswordForm) => {
     try {
-      await services['POST /api/updatePassword'](values);
+      await services['POST /api/user/updatePassword'](values);
       message.success('修改成功');
       passwordForm.resetFields();
     } catch (error) {
@@ -141,8 +140,16 @@ const UserInfo: FC = () => {
             </Form.Item>
 
             <Form.Item
-              label="用户名"
+              label="账号"
               name="username"
+              rules={[{ required: true }]}
+            >
+              <Input disabled />
+            </Form.Item>
+
+            <Form.Item
+              label="昵称"
+              name="nickname"
               rules={[{ required: true }]}
             >
               <Input />

@@ -4,7 +4,7 @@ export default class User {
   token = localStorage.getItem('user.token') || '';
   role = localStorage.getItem('user.role') || '';
   avatarURL = localStorage.getItem('user.avatarURL') || '';
-  username = localStorage.getItem('user.username') || '';
+  nickname = localStorage.getItem('user.username') || '';
 
   constructor() {
     makeAutoObservable(this);
@@ -17,20 +17,20 @@ export default class User {
 
   @action setUserInfo = (userinfo: {
     avatarURL: string;
-    username: string;
+    nickname: string;
     role: string;
   }) => {
     this.avatarURL = userinfo.avatarURL;
-    this.username = userinfo.username;
+    this.nickname = userinfo.nickname;
     this.role = userinfo.role;
     localStorage.setItem('user.avatarURL', userinfo.avatarURL);
-    localStorage.setItem('user.username', userinfo.username);
+    localStorage.setItem('user.nickname', userinfo.nickname);
     localStorage.setItem('user.role', userinfo.role);
   };
 
   @action logoff = () => {
     this.setToken('');
-    this.setUserInfo({ avatarURL: '', username: '', role: '' });
+    this.setUserInfo({ avatarURL: '', nickname: '', role: '' });
   };
 
   getToken() {

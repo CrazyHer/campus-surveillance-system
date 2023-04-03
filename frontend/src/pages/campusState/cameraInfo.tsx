@@ -12,7 +12,7 @@ const CameraInfo: FC<{
   cameraID: number;
 }> = (props) => {
   const [data, setData] =
-    useState<ServiceTypes['GET /api/getCameraInfo']['res']['data']>();
+    useState<ServiceTypes['GET /api/user/getCameraInfo']['res']['data']>();
   const [fetchLoading, setFetchLoading] = useState(false);
   const [resolveLoading, setResolveLoading] = useState(false);
 
@@ -20,8 +20,11 @@ const CameraInfo: FC<{
     try {
       setFetchLoading(true);
       setData(
-        (await services['GET /api/getCameraInfo']({ cameraID: props.cameraID }))
-          .data,
+        (
+          await services['GET /api/user/getCameraInfo']({
+            cameraID: props.cameraID,
+          })
+        ).data,
       );
     } catch (error) {
       message.error(String(error));
@@ -37,10 +40,13 @@ const CameraInfo: FC<{
   const handleResolveAlarm = async (eventID: number) => {
     try {
       setResolveLoading(true);
-      await services['POST /api/resolveAlarm']({ eventID });
+      await services['POST /api/user/resolveAlarm']({ eventID });
       setData(
-        (await services['GET /api/getCameraInfo']({ cameraID: props.cameraID }))
-          .data,
+        (
+          await services['GET /api/user/getCameraInfo']({
+            cameraID: props.cameraID,
+          })
+        ).data,
       );
     } catch (error) {
       message.error(String(error));
@@ -51,7 +57,7 @@ const CameraInfo: FC<{
   };
 
   const tableColumns: ColumnType<
-    ServiceTypes['GET /api/getCameraInfo']['res']['data']['alarmEvents'][0]
+    ServiceTypes['GET /api/user/getCameraInfo']['res']['data']['alarmEvents'][0]
   >[] = [
     {
       title: '报警时间',

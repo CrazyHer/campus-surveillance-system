@@ -57,7 +57,9 @@ const AlarmRulesManage: FC = () => {
   const fetchAlarmRuleList = async () => {
     try {
       setFetchLoading(true);
-      setAlarmRuleList((await services['GET /api/getAlarmRuleList']()).data);
+      setAlarmRuleList(
+        (await services['GET /api/admin/getAlarmRuleList']()).data,
+      );
     } catch (error) {
       console.error(error);
       message.error(String(error));
@@ -67,7 +69,7 @@ const AlarmRulesManage: FC = () => {
   };
   const fetchCameraList = async () => {
     try {
-      setCameraList((await services['GET /api/getCameraList']()).data);
+      setCameraList((await services['GET /api/admin/getCameraList']()).data);
     } catch (error) {
       console.error(error);
       message.error(String(error));
@@ -106,7 +108,7 @@ const AlarmRulesManage: FC = () => {
 
   const handleDelete = async (alarmRuleID: number) => {
     try {
-      await services['POST /api/deleteAlarmRule']({
+      await services['POST /api/admin/deleteAlarmRule']({
         alarmRuleID,
       });
       message.success('删除成功');
@@ -120,7 +122,7 @@ const AlarmRulesManage: FC = () => {
   const handleAddSubmit = async () => {
     const formData = await addForm.validateFields();
     try {
-      await services['POST /api/addAlarmRule']({
+      await services['POST /api/admin/addAlarmRule']({
         alarmRuleName: formData.alarmRuleName,
         algorithmType: formData.algorithmType,
         enabled: formData.enabled,
@@ -151,7 +153,7 @@ const AlarmRulesManage: FC = () => {
   const handleEditSubmit = async () => {
     const formData = await editForm.validateFields();
     try {
-      await services['POST /api/updateAlarmRule']({
+      await services['POST /api/admin/updateAlarmRule']({
         alarmRuleID: formData.alarmRuleID,
         alarmRuleName: formData.alarmRuleName,
         algorithmType: formData.algorithmType,

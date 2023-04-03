@@ -13,12 +13,12 @@ import mobxStore from '@/mobxStore';
 const CampusState: FC = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] =
-    useState<ServiceTypes['GET /api/getCampusState']['res']['data']>();
+    useState<ServiceTypes['GET /api/user/getCampusState']['res']['data']>();
   const [selectedCameraIds, setSelectedCameraIds] = useState<number[]>([]);
   const fetchCampusState = async () => {
     try {
       setLoading(true);
-      const res = await services['GET /api/getCampusState']();
+      const res = await services['GET /api/user/getCampusState']();
       setData(res.data);
     } catch (error) {
       message.error(String(error));

@@ -18,10 +18,11 @@ import services from '@/services';
 import { ColumnType } from 'antd/es/table';
 import constants from '@/constants';
 import { useForm } from 'antd/es/form/Form';
+import CryptoJS from 'crypto-js';
 
-type AddFormData = ServiceTypes['POST /api/addUser']['req'];
+type AddFormData = ServiceTypes['POST /api/admin/addUser']['req'];
 
-type EditFormData = ServiceTypes['POST /api/updateUser']['req'];
+type EditFormData = ServiceTypes['POST /api/admin/updateUser']['req'];
 
 const UsersManage: FC = () => {
   const [userList, setUserList] = useState<UserInfo[]>([]);
@@ -34,7 +35,7 @@ const UsersManage: FC = () => {
   const fetchUserList = async () => {
     try {
       setFetchLoading(true);
-      setUserList((await services['GET /api/getUserList']()).data);
+      setUserList((await services['GET /api/admin/getUserList']()).data);
     } catch (error) {
       console.log(error);
       message.error(String(error));
@@ -60,7 +61,7 @@ const UsersManage: FC = () => {
 
   const handleDeleteUser = async (username: string) => {
     try {
-      await services['POST /api/deleteUser']({ username });
+      await services['POST /api/admin/deleteUser']({ username });
       message.success('删除用户成功');
       fetchUserList();
     } catch (error) {
@@ -72,7 +73,13 @@ const UsersManage: FC = () => {
   const handleAddSubmit = async () => {
     const values = await addForm.validateFields();
     try {
-      await services['POST /api/addUser'](values);
+      await services['POST /api/admin/addUser']({
+        ...values,
+        password: CryptoJS.HmacSHA256(
+          values.password,
+          constants.SHA256KEY,
+        ).toString(CryptoJS.enc.Base64),
+      });
       message.success('新增用户成功');
       setAddModalVisible(false);
       fetchUserList();
@@ -85,7 +92,15 @@ const UsersManage: FC = () => {
   const handleEditSubmit = async () => {
     const values = await editForm.validateFields();
     try {
-      await services['POST /api/updateUser'](values);
+      await services['POST /api/admin/updateUser']({
+        ...values,
+        newPassword: values.newPassword
+          ? CryptoJS.HmacSHA256(
+              values.newPassword,
+              constants.SHA256KEY,
+            ).toString(CryptoJS.enc.Base64)
+          : undefined,
+      });
       message.success('编辑用户成功');
       setEditModalVisible(false);
       fetchUserList();
@@ -96,7 +111,8 @@ const UsersManage: FC = () => {
   };
 
   const columns: ColumnType<UserInfo>[] = [
-    { title: '用户名', dataIndex: 'username' },
+    { title: '账号', dataIndex: 'username' },
+    { title: '昵称', dataIndex: 'nickname' },
     {
       title: '权限',
       dataIndex: 'role',
@@ -133,6 +149,10 @@ const UsersManage: FC = () => {
             { label: '普通用户', value: 'user' },
           ]}
         />
+      </Form.Item>
+
+      <Form.Item label="昵称" name="nickname" rules={[{ required: true }]}>
+        <Input />
       </Form.Item>
 
       <Form.Item label="邮箱" name="email" rules={[{ type: 'email' }]}>
@@ -182,7 +202,7 @@ const UsersManage: FC = () => {
         >
           <Form form={addForm} requiredMark="optional">
             <Form.Item
-              label="用户名"
+              label="账号"
               name="username"
               rules={[{ required: true }]}
             >

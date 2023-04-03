@@ -11,7 +11,7 @@ import { observer } from 'mobx-react';
 import { FC, useEffect, useState } from 'react';
 import Styles from './index.module.less';
 
-type DataType = ServiceTypes['GET /api/getAlarmEvents']['res']['data'][0];
+type DataType = ServiceTypes['GET /api/user/getAlarmEvents']['res']['data'][0];
 const Alarms: FC = () => {
   const columns: ColumnType<DataType>[] = [
     { title: '事件ID', dataIndex: 'eventID' },
@@ -60,7 +60,7 @@ const Alarms: FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      setData((await services['GET /api/getAlarmEvents']({})).data);
+      setData((await services['GET /api/user/getAlarmEvents']({})).data);
     } catch (error) {
       message.error(String(error));
       console.error(error);
@@ -78,7 +78,7 @@ const Alarms: FC = () => {
   const handleCheck = async (eventID: number) => {
     try {
       setCheckLoading(true);
-      await services['POST /api/resolveAlarm']({ eventID });
+      await services['POST /api/user/resolveAlarm']({ eventID });
       message.success('处理成功');
       setModalVisible(false);
       fetchData();

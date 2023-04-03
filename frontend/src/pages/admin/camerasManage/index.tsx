@@ -26,11 +26,10 @@ import { observer } from 'mobx-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import Styles from './index.module.less';
 
-type CameraList = ServiceTypes['GET /api/getCameraList']['res']['data'];
+type CameraList = ServiceTypes['GET /api/admin/getCameraList']['res']['data'];
 
 interface AddFormData {
   cameraName: string;
-  hlsUrl: string;
   Lattitude: number;
   Longitude: number;
   cameraModel: string;
@@ -40,7 +39,6 @@ interface AddFormData {
 interface EditFormData {
   cameraID: number;
   cameraName: string;
-  hlsUrl: string;
   Lattitude: number;
   Longitude: number;
   cameraModel: string;
@@ -50,7 +48,7 @@ interface EditFormData {
 const CamerasManage: FC = () => {
   const [cameraList, setCameraList] = useState<CameraList>([]);
   const [alarmRuleList, setAlarmRuleList] = useState<
-    ServiceTypes['GET /api/getAlarmRuleList']['res']['data']
+    ServiceTypes['GET /api/admin/getAlarmRuleList']['res']['data']
   >([]);
   const [loading, setLoading] = useState(false);
   const [selectedCameraIds, setSelectedCameraIds] = useState<number[]>([]);
@@ -62,7 +60,7 @@ const CamerasManage: FC = () => {
   const fetchCameraList = async () => {
     try {
       setLoading(true);
-      setCameraList((await services['GET /api/getCameraList']()).data);
+      setCameraList((await services['GET /api/admin/getCameraList']()).data);
     } catch (error) {
       console.error(error);
       message.error(String(error));
@@ -73,7 +71,9 @@ const CamerasManage: FC = () => {
 
   const fetchAlarmRuleList = async () => {
     try {
-      setAlarmRuleList((await services['GET /api/getAlarmRuleList']()).data);
+      setAlarmRuleList(
+        (await services['GET /api/admin/getAlarmRuleList']()).data,
+      );
     } catch (error) {
       console.error(error);
       message.error(String(error));
@@ -102,7 +102,7 @@ const CamerasManage: FC = () => {
 
   const handleDeleteCamera = async (cameraID: number) => {
     try {
-      await services['POST /api/deleteCamera']({ cameraID });
+      await services['POST /api/admin/deleteCamera']({ cameraID });
       message.success('删除成功');
       fetchCameraList();
     } catch (error) {
@@ -124,10 +124,9 @@ const CamerasManage: FC = () => {
     const formData = await editCameraForm.validateFields();
 
     try {
-      await services['POST /api/updateCamera']({
+      await services['POST /api/admin/updateCamera']({
         cameraID: formData.cameraID,
         cameraName: formData.cameraName,
-        hlsUrl: formData.hlsUrl,
         latlng: [formData.Lattitude, formData.Longitude],
         cameraModel: formData.cameraModel,
         alarmRuleIDs: formData.alarmRuleIDs,
@@ -145,9 +144,8 @@ const CamerasManage: FC = () => {
     const formData = await addCameraForm.validateFields();
 
     try {
-      await services['POST /api/addCamera']({
+      await services['POST /api/admin/addCamera']({
         cameraName: formData.cameraName,
-        hlsUrl: formData.hlsUrl,
         latlng: [formData.Lattitude, formData.Longitude],
         cameraModel: formData.cameraModel,
         alarmRuleIDs: formData.alarmRuleIDs,
@@ -280,14 +278,6 @@ const CamerasManage: FC = () => {
         <Input />
       </Form.Item>
 
-      <Form.Item
-        label="HLS流地址"
-        name="hlsUrl"
-        rules={[{ required: true }, { type: 'url' }]}
-      >
-        <Input type="url" />
-      </Form.Item>
-
       <Form.Item label="报警规则" name="alarmRuleIDs">
         <Select<
           EditFormData['alarmRuleIDs'][number],
@@ -317,7 +307,7 @@ const CamerasManage: FC = () => {
 
           <Alert
             className={Styles.alert}
-            message="提示：单击地图可在此处添加摄像头"
+            message="提示：单击地图可在对应位置添加摄像头"
             type="info"
             showIcon
             closable

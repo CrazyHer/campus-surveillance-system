@@ -1,4 +1,4 @@
-import { Form, Input, Button, message, Checkbox } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { observer } from 'mobx-react';
 import { FC, useEffect, useState } from 'react';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
@@ -7,10 +7,11 @@ import Style from './index.module.less';
 import { history } from 'umi';
 import mobxStore from '@/mobxStore';
 import services from '@/services';
-import loginIcon from '@/assets/loginIcon.png';
+import brandIcon from '@/assets/icon.png';
+import constants from '@/constants';
 
 interface IFormData {
-  userID: string;
+  username: string;
   password: string;
 }
 
@@ -18,6 +19,8 @@ const Login: FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [loginForm] = Form.useForm<IFormData>();
+
+  document.title = '智慧园区 · 监控管理系统';
 
   useEffect(() => {
     if (mobxStore.user.token) {
@@ -29,11 +32,11 @@ const Login: FC = () => {
   const handleLogin = async (formData: IFormData) => {
     setLoading(true);
     try {
-      const res = await services['POST /api/login']({
-        username: formData.userID,
+      const res = await services['POST /api/user/login']({
+        username: formData.username,
         // 对密码进行SHA256加密
         password: crypto
-          .HmacSHA256(formData.password, 'sdudoc')
+          .HmacSHA256(formData.password, constants.SHA256KEY)
           .toString(crypto.enc.Base64),
       });
 
@@ -52,45 +55,43 @@ const Login: FC = () => {
     <div className={Style.body}>
       <div className={Style.leftPic} />
       <div className={Style.rightContent}>
-        <img className={Style.icon} src={loginIcon} />
+        <img className={Style.icon} src={brandIcon} />
         <div className={Style.title}>智慧园区 · 监控管理系统</div>
-        <div className={Style.loginForm}>
-          <Form key="loginForm" onFinish={handleLogin} form={loginForm}>
-            <Form.Item
-              name="userID"
-              rules={[{ required: true, message: '请输入账号!' }]}
+        <Form
+          className={Style.loginForm}
+          onFinish={handleLogin}
+          form={loginForm}
+        >
+          <Form.Item
+            name="username"
+            rules={[{ required: true, message: '请输入账号!' }]}
+          >
+            <Input prefix={<UserOutlined />} placeholder="账号" />
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            rules={[{ required: true, message: '请输入密码!' }]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              type="password"
+              placeholder="密码"
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              style={{ width: '100%', marginTop: '15px' }}
+              type="primary"
+              htmlType="submit"
+              className={Style['login-form-button']}
+              loading={loading}
             >
-              <Input prefix={<UserOutlined />} placeholder="账号" />
-            </Form.Item>
-
-            <Form.Item
-              name="password"
-              rules={[{ required: true, message: '请输入密码!' }]}
-            >
-              <Input.Password
-                prefix={<LockOutlined />}
-                type="password"
-                placeholder="密码"
-              />
-            </Form.Item>
-
-            <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>记住密码</Checkbox>
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                style={{ width: '100%', marginTop: '15px' }}
-                type="primary"
-                htmlType="submit"
-                className={Style['login-form-button']}
-                loading={loading}
-              >
-                登录
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
+              登录
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </div>
   );
