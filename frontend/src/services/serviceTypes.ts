@@ -4,8 +4,11 @@ export interface AlarmRuleBase {
 }
 
 export interface AlarmRuleFull extends AlarmRuleBase {
-  relatedCameraIDs: number[];
-  status: 'enabled' | 'disabled';
+  relatedCameras: {
+    cameraName: string;
+    cameraID: number;
+  }[];
+  enabled: boolean;
   algorithmType: 'body' | 'vehicle';
   triggerCondition: {
     time: {
@@ -283,7 +286,9 @@ export default interface ServiceTypes {
     };
   };
   'POST /api/addAlarmRule': {
-    req: Omit<AlarmRuleFull, 'alarmRuleID'>;
+    req: Omit<AlarmRuleFull, 'alarmRuleID' | 'relatedCameras'> & {
+      relatedCameraIds: number[];
+    };
     res: {
       data: {};
       message: string;
@@ -291,7 +296,9 @@ export default interface ServiceTypes {
     };
   };
   'POST /api/updateAlarmRule': {
-    req: AlarmRuleFull;
+    req: Omit<AlarmRuleFull, 'relatedCameras'> & {
+      relatedCameraIds: number[];
+    };
     res: {
       data: {};
       message: string;
@@ -301,6 +308,59 @@ export default interface ServiceTypes {
   'POST /api/deleteAlarmRule': {
     req: {
       alarmRuleID: number;
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'GET /api/getUserList': {
+    req: void;
+    res: {
+      data: {
+        username: string;
+        role: 'admin' | 'user';
+        avatarURL: string;
+        tel: string;
+        email: string;
+      }[];
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/addUser': {
+    req: {
+      username: string;
+      password: string;
+      role: 'admin' | 'user';
+      avatarURL: string;
+      tel: string;
+      email: string;
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/updateUser': {
+    req: {
+      username: string;
+      role: 'admin' | 'user';
+      avatarURL: string;
+      tel: string;
+      email: string;
+    };
+    res: {
+      data: {};
+      message: string;
+      success: boolean;
+    };
+  };
+  'POST /api/deleteUser': {
+    req: {
+      username: string;
     };
     res: {
       data: {};

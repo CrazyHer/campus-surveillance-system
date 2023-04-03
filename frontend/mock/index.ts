@@ -268,16 +268,98 @@ export default {
       {
         alarmRuleID: 1,
         alarmRuleName: '报警规则1',
+        relatedCameras: [
+          { cameraID: 1, cameraName: '摄像头1' },
+          { cameraID: 2, cameraName: '摄像头2' },
+        ],
+        algorithmType: 'body',
+        enabled: true,
+        triggerCondition: {
+          count: { max: 2, min: 1 },
+          time: { dayOfWeek: [1, 2, 3], timeRange: ['00:00:00', '23:59:59'] },
+        },
       },
       {
         alarmRuleID: 2,
         alarmRuleName: '报警规则2',
+        relatedCameras: [
+          { cameraID: 1, cameraName: '摄像头1' },
+          { cameraID: 2, cameraName: '摄像头2' },
+        ],
+        algorithmType: 'vehicle',
+        enabled: true,
+        triggerCondition: {
+          count: { max: 2, min: 1 },
+          time: { dayOfWeek: [1, 2, 3], timeRange: ['00:00:00', '23:59:59'] },
+        },
       },
       {
         alarmRuleID: 3,
         alarmRuleName: '报警规则3',
+        relatedCameras: [
+          { cameraID: 1, cameraName: '摄像头1' },
+          { cameraID: 2, cameraName: '摄像头2' },
+        ],
+        algorithmType: 'body',
+        enabled: false,
+        triggerCondition: {
+          count: { max: 2, min: 1 },
+          time: { dayOfWeek: [1, 2, 3], timeRange: ['00:00:00', '23:59:59'] },
+        },
       },
     ],
+    message: '',
+    success: true,
+  },
+  'POST /api/addAlarmRule': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'POST /api/updateAlarmRule': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'POST /api/deleteAlarmRule': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'GET /api/getUserList': {
+    data: [
+      {
+        username: 'admin',
+        role: 'admin',
+        tel: '12345678901',
+        email: '123@456.com',
+        avatarURL:
+          'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+      },
+      {
+        username: 'user',
+        role: 'user',
+        tel: '12345678901',
+        email: '123@456.com',
+        avatarURL:
+          'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+      },
+    ],
+    message: '',
+    success: true,
+  },
+  'POST /api/addUser': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'POST /api/updateUser': {
+    data: {},
+    message: '',
+    success: true,
+  },
+  'POST /api/deleteUser': {
+    data: {},
     message: '',
     success: true,
   },

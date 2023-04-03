@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import Styles from './index.module.less';
 import hls from 'hls.js';
+import constants from '@/constants';
 const MonitScreen: FC<{}> = () => {
   const videosRef = useRef<Map<number, HTMLVideoElement>>(new Map());
   const [data, setData] = useState<
@@ -76,9 +77,9 @@ const MonitScreen: FC<{}> = () => {
               title={item.cameraName}
               size="small"
               extra={
-                item.cameraStatus === 'normal' ? (
+                item.cameraStatus === constants.cameraStatus.NORMAL ? (
                   <Badge status="success" text="正常" />
-                ) : item.cameraStatus === 'offline' ? (
+                ) : item.cameraStatus === constants.cameraStatus.OFFLINE ? (
                   <Badge status="default" text="离线" />
                 ) : (
                   <Badge status="error" text="报警" />

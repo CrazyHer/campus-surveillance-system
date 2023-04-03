@@ -245,7 +245,7 @@ const CamerasManage: FC = () => {
     },
   ];
 
-  const sameFormItems = (
+  const commonFormItems = (
     <>
       <Form.Item
         label="摄像头名称"
@@ -345,7 +345,7 @@ const CamerasManage: FC = () => {
           </>
         }
       >
-        <Form form={addCameraForm}>{sameFormItems}</Form>
+        <Form form={addCameraForm}>{commonFormItems}</Form>
       </Modal>
 
       <Modal
@@ -380,7 +380,7 @@ const CamerasManage: FC = () => {
           <Form.Item label="摄像头ID" name="cameraID">
             <Input disabled />
           </Form.Item>
-          {sameFormItems}
+          {commonFormItems}
         </Form>
       </Modal>
     </div>
