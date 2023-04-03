@@ -22,6 +22,14 @@ export interface AlarmRuleFull extends AlarmRuleBase {
   };
 }
 
+export interface UserInfo {
+  username: string;
+  role: 'admin' | 'user';
+  avatarURL: string;
+  tel: string;
+  email: string;
+}
+
 export default interface ServiceTypes {
   'POST /api/login': {
     req: { username: string; password: string };
@@ -133,24 +141,13 @@ export default interface ServiceTypes {
   'GET /api/getUserInfo': {
     req: void;
     res: {
-      data: {
-        username: string;
-        role: 'admin' | 'user';
-        avatarURL: string;
-        tel: string;
-        email: string;
-      };
+      data: UserInfo;
       message: string;
       success: boolean;
     };
   };
   'POST /api/updateUserInfo': {
-    req: {
-      username: string;
-      avatarURL: string;
-      tel: string;
-      email: string;
-    };
+    req: Omit<UserInfo, 'role'>;
     res: {
       data: {};
       message: string;
@@ -318,13 +315,7 @@ export default interface ServiceTypes {
   'GET /api/getUserList': {
     req: void;
     res: {
-      data: {
-        username: string;
-        role: 'admin' | 'user';
-        avatarURL: string;
-        tel: string;
-        email: string;
-      }[];
+      data: UserInfo[];
       message: string;
       success: boolean;
     };
@@ -332,11 +323,10 @@ export default interface ServiceTypes {
   'POST /api/addUser': {
     req: {
       username: string;
-      password: string;
       role: 'admin' | 'user';
-      avatarURL: string;
-      tel: string;
-      email: string;
+      tel?: string;
+      email?: string;
+      password: string;
     };
     res: {
       data: {};
@@ -345,13 +335,7 @@ export default interface ServiceTypes {
     };
   };
   'POST /api/updateUser': {
-    req: {
-      username: string;
-      role: 'admin' | 'user';
-      avatarURL: string;
-      tel: string;
-      email: string;
-    };
+    req: UserInfo;
     res: {
       data: {};
       message: string;
