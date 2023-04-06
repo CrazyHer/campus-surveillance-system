@@ -1,8 +1,8 @@
 import services from '@/services';
-import ServiceTypes from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 import { message, Spin } from 'antd';
 import { observer } from 'mobx-react';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { type FC, useCallback, useEffect, useState } from 'react';
 import CameraInfo from './cameraInfo';
 import CameraList from './cameraList';
 import CampusMap from '../../components/campusMap';

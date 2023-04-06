@@ -1,5 +1,5 @@
 import services from '@/services';
-import ServiceTypes from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 import {
   Button,
   Card,
@@ -8,21 +8,25 @@ import {
   message,
   Spin,
   Upload,
-  UploadProps,
+  type UploadProps,
 } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import Styles from './index.module.less';
 import ImgCrop from 'antd-img-crop';
-import { UploadFile } from 'antd/es/upload';
+import { type UploadFile } from 'antd/es/upload';
 
-const getBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
+const getBase64 = async (file: File): Promise<string> => {
+  return await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = (error) => reject(error);
+    reader.onload = () => {
+      resolve(String(reader.result));
+    };
+    reader.onerror = (error) => {
+      reject(error);
+    };
   });
 };
 
@@ -33,11 +37,11 @@ const UserInfo: FC = () => {
   type UserInfoForm = ServiceTypes['GET /api/user/getUserInfo']['res']['data'];
   const [userInfoForm] = useForm<UserInfoForm>();
 
-  type PasswordForm = {
+  interface PasswordForm {
     oldPassword: string;
     newPassword: string;
     confirmPassword: string;
-  };
+  }
   const [passwordForm] = useForm<PasswordForm>();
 
   const [imgFileList, setImgFileList] = useState<UploadFile[]>([]);
@@ -74,9 +78,9 @@ const UserInfo: FC = () => {
   const handleUserInfoSubmit = async (values: UserInfoForm) => {
     try {
       const avatarURL =
-        (imgFileList[0]?.originFileObj
+        (imgFileList[0]?.originFileObj != null
           ? await getBase64(imgFileList[0].originFileObj)
-          : data?.avatarURL) || '';
+          : data?.avatarURL) ?? '';
       await services['POST /api/user/updateUserInfo']({
         ...values,
         avatarURL,
@@ -126,7 +130,9 @@ const UserInfo: FC = () => {
                       onSuccess?.('ok');
                     }, 0);
                   }}
-                  onRemove={() => setImgFileList([])}
+                  onRemove={() => {
+                    setImgFileList([]);
+                  }}
                   onChange={handleAvatarChange}
                   fileList={imgFileList}
                   maxCount={1}
@@ -213,11 +219,14 @@ const UserInfo: FC = () => {
               rules={[
                 { required: true },
                 ({ getFieldValue }) => ({
-                  validator(_, value) {
+                  async validator(_, value) {
                     if (!value || getFieldValue('newPassword') === value) {
-                      return Promise.resolve();
+                      await Promise.resolve();
+                      return;
                     }
-                    return Promise.reject(new Error('两次输入的密码不一致'));
+                    return await Promise.reject(
+                      new Error('两次输入的密码不一致'),
+                    );
                   },
                 }),
               ]}

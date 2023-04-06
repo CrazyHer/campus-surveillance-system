@@ -1,23 +1,25 @@
 import CameraStatusBadge from '@/components/cameraStatusBadge';
-import ServiceTypes from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 import { Button, Card, Table } from 'antd';
-import { ColumnType } from 'antd/es/table';
+import { type ColumnType } from 'antd/es/table';
 import { observer } from 'mobx-react';
-import { FC } from 'react';
+import { type FC } from 'react';
 import Styles from './index.module.less';
 const CameraList: FC<{
-  data?: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'];
+  data?: ServiceTypes['GET /api/user/getCampusState']['res']['data']['cameraList'];
   onCameraCheck: (cameraID: number) => any;
 }> = (props) => {
-  const columns: ColumnType<
-    ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0]
-  >[] = [
+  const columns: Array<ColumnType<
+    ServiceTypes['GET /api/user/getCampusState']['res']['data']['cameraList'][0]
+  >> = [
     { title: '摄像头名称', dataIndex: 'cameraName' },
     {
       title: '状态',
       dataIndex: 'cameraStatus',
       render: (_value, record) => (
-        <CameraStatusBadge status={record.cameraStatus} />
+        <CameraStatusBadge
+          status={record.cameraStatus as 'normal' | 'offline' | 'alarm'}
+        />
       ),
     },
     {

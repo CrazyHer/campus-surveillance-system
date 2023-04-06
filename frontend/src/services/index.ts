@@ -1,5 +1,5 @@
 import mobxStore from '@/mobxStore';
-import ServiceTypes from './serviceTypes';
+import type ServiceTypes from './serviceTypes';
 import constants from '@/constants';
 
 const fetchData = async (api: string, data: any): Promise<any> => {
@@ -9,7 +9,7 @@ const fetchData = async (api: string, data: any): Promise<any> => {
   if (method === 'GET') {
     res = await fetch(
       `${constants.FETCH_ROOT}${url}${
-        data ? '?' + new URLSearchParams(data as any).toString() : ''
+        data ? '?' + new URLSearchParams(data ).toString() : ''
       }`,
       {
         headers: { Authorization },
@@ -17,8 +17,11 @@ const fetchData = async (api: string, data: any): Promise<any> => {
       },
     );
   } else {
-    res = await fetch(url, {
-      headers: { Authorization },
+    res = await fetch(`${constants.FETCH_ROOT}${url}`, {
+      headers: {
+        Authorization,
+        'Content-Type': 'application/json; charset=utf-8',
+      },
       method,
       body: data instanceof FormData ? data : JSON.stringify(data),
     });
@@ -39,7 +42,7 @@ export default new Proxy(
   {},
   {
     get: (_t, p) => {
-      return (data: any) => fetchData(p as string, data);
+      return async (data: any) => await fetchData(p as string, data);
     },
   },
 ) as {

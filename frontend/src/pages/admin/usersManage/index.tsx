@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import Styles from './index.module.less';
 import {
   Button,
@@ -13,9 +13,9 @@ import {
   Table,
   message,
 } from 'antd';
-import ServiceTypes, { UserInfo } from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 import services from '@/services';
-import { ColumnType } from 'antd/es/table';
+import { type ColumnType } from 'antd/es/table';
 import constants from '@/constants';
 import { useForm } from 'antd/es/form/Form';
 import CryptoJS from 'crypto-js';
@@ -23,6 +23,9 @@ import CryptoJS from 'crypto-js';
 type AddFormData = ServiceTypes['POST /api/admin/addUser']['req'];
 
 type EditFormData = ServiceTypes['POST /api/admin/updateUser']['req'];
+
+type UserInfo =
+  ServiceTypes['GET /api/admin/getUserList']['res']['data'][number];
 
 const UsersManage: FC = () => {
   const [userList, setUserList] = useState<UserInfo[]>([]);
@@ -94,6 +97,7 @@ const UsersManage: FC = () => {
     try {
       await services['POST /api/admin/updateUser']({
         ...values,
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         newPassword: values.newPassword
           ? CryptoJS.HmacSHA256(
               values.newPassword,
@@ -110,7 +114,7 @@ const UsersManage: FC = () => {
     }
   };
 
-  const columns: ColumnType<UserInfo>[] = [
+  const columns: Array<ColumnType<UserInfo>> = [
     { title: '账号', dataIndex: 'username' },
     { title: '昵称', dataIndex: 'nickname' },
     {
@@ -125,13 +129,20 @@ const UsersManage: FC = () => {
       title: '操作',
       render: (_v, record) => (
         <Button.Group>
-          <Button type="link" onClick={() => handleEditUser(record)}>
+          <Button
+            type="link"
+            onClick={() => {
+              handleEditUser(record);
+            }}
+          >
             编辑
           </Button>
 
           <Popconfirm
             title="确认删除该用户?"
-            onConfirm={() => handleDeleteUser(record.username)}
+            onConfirm={async () => {
+              await handleDeleteUser(record.username);
+            }}
           >
             <Button type="link">删除</Button>
           </Popconfirm>
@@ -189,14 +200,22 @@ const UsersManage: FC = () => {
 
         <Modal
           open={addModalVisible}
-          onCancel={() => setAddModalVisible(false)}
+          onCancel={() => {
+            setAddModalVisible(false);
+          }}
           title="新增用户"
           footer={
             <Button.Group>
               <Button type="primary" onClick={handleAddSubmit}>
                 提交
               </Button>
-              <Button onClick={() => setAddModalVisible(false)}>取消</Button>
+              <Button
+                onClick={() => {
+                  setAddModalVisible(false);
+                }}
+              >
+                取消
+              </Button>
             </Button.Group>
           }
         >
@@ -223,14 +242,22 @@ const UsersManage: FC = () => {
 
         <Modal
           open={editModalVisible}
-          onCancel={() => setEditModalVisible(false)}
+          onCancel={() => {
+            setEditModalVisible(false);
+          }}
           title="编辑用户"
           footer={
             <Button.Group>
               <Button type="primary" onClick={handleEditSubmit}>
                 提交
               </Button>
-              <Button onClick={() => setEditModalVisible(false)}>取消</Button>
+              <Button
+                onClick={() => {
+                  setEditModalVisible(false);
+                }}
+              >
+                取消
+              </Button>
             </Button.Group>
           }
         >

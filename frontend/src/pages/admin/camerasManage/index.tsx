@@ -2,7 +2,7 @@ import CameraStatusBadge from '@/components/cameraStatusBadge';
 import CampusMap from '@/components/campusMap';
 import mobxStore from '@/mobxStore';
 import services from '@/services';
-import ServiceTypes from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 import {
   Alert,
   Button,
@@ -20,10 +20,10 @@ import {
   Tag,
 } from 'antd';
 import { useForm } from 'antd/es/form/Form';
-import { ColumnsType } from 'antd/es/table';
-import { LeafletMouseEvent, Map } from 'leaflet';
+import { type ColumnsType } from 'antd/es/table';
+import { type LeafletMouseEvent, type Map } from 'leaflet';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 import Styles from './index.module.less';
 
 type CameraList = ServiceTypes['GET /api/admin/getCameraList']['res']['data'];
@@ -114,7 +114,7 @@ const CamerasManage: FC = () => {
   const handleMapCameraClick = (cameraID: number) => {
     if (selectedCameraIds[0] === cameraID) {
       const cameraInfo = cameraList.find((item) => item.cameraID === cameraID);
-      cameraInfo && handleConfigCamera(cameraInfo);
+      (cameraInfo != null) && handleConfigCamera(cameraInfo);
       return;
     }
     setSelectedCameraIds([cameraID]);
@@ -201,7 +201,9 @@ const CamerasManage: FC = () => {
       title: '状态',
       dataIndex: 'cameraStatus',
       render: (_v, { cameraStatus }) => (
-        <CameraStatusBadge status={cameraStatus} />
+        <CameraStatusBadge
+          status={cameraStatus as 'normal' | 'offline' | 'alarm'}
+        />
       ),
     },
     {
@@ -225,16 +227,16 @@ const CamerasManage: FC = () => {
         <Button.Group>
           <Button
             type="link"
-            onClick={() => handleLocateCamera(record.cameraID)}
+            onClick={() => { handleLocateCamera(record.cameraID); }}
           >
             定位
           </Button>
-          <Button type="link" onClick={() => handleConfigCamera(record)}>
+          <Button type="link" onClick={() => { handleConfigCamera(record); }}>
             配置
           </Button>
           <Popconfirm
             title="确认删除该摄像头?"
-            onConfirm={() => handleDeleteCamera(record.cameraID)}
+            onConfirm={async () => { await handleDeleteCamera(record.cameraID); }}
           >
             <Button type="link">删除</Button>
           </Popconfirm>
@@ -324,14 +326,14 @@ const CamerasManage: FC = () => {
       <Modal
         title="新增摄像头"
         open={addModalOpen}
-        onCancel={() => setAddModalOpen(false)}
+        onCancel={() => { setAddModalOpen(false); }}
         centered
         footer={
           <>
             <Button type="primary" onClick={handleAddSubmit}>
               提交
             </Button>
-            <Button onClick={() => setAddModalOpen(false)}>返回</Button>
+            <Button onClick={() => { setAddModalOpen(false); }}>返回</Button>
           </>
         }
       >
@@ -341,7 +343,7 @@ const CamerasManage: FC = () => {
       <Modal
         title="配置摄像头"
         open={editModalOpen}
-        onCancel={() => setEditModalOpen(false)}
+        onCancel={() => { setEditModalOpen(false); }}
         centered
         footer={
           <>
@@ -362,7 +364,7 @@ const CamerasManage: FC = () => {
               </Button>
             </Popconfirm>
 
-            <Button onClick={() => setEditModalOpen(false)}>返回</Button>
+            <Button onClick={() => { setEditModalOpen(false); }}>返回</Button>
           </>
         }
       >

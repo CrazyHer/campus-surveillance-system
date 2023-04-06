@@ -1,5 +1,5 @@
 import services from '@/services';
-import { CRS, ImageOverlay, MapOptions, TileLayer } from 'leaflet';
+import { CRS, ImageOverlay, type MapOptions, TileLayer } from 'leaflet';
 import { action, makeAutoObservable } from 'mobx';
 
 class MapConfig {
@@ -10,7 +10,7 @@ class MapConfig {
   }
 
   @action setConfig(config: MapOptions) {
-    if (this._config) {
+    if (this._config != null) {
       Object.assign(this._config, config);
     } else {
       this._config = config;
@@ -19,10 +19,10 @@ class MapConfig {
 
   // lazy fetch map config
   get config(): MapOptions {
-    if (this._config) {
+    if (this._config != null) {
       return this._config;
     } else {
-      this.fetchAndSetMapConfig();
+      this.fetchAndSetMapConfig().catch(console.error);
       return {
         center: [0, 0],
         zoom: 0,

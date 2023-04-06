@@ -13,20 +13,20 @@ import {
   Space,
   Spin,
   Upload,
-  UploadFile,
+  type UploadFile,
 } from 'antd';
-import { FormProps, useForm, useWatch } from 'antd/es/form/Form';
-import { CRS, ImageOverlay, MapOptions, TileLayer } from 'leaflet';
+import { type FormProps, useForm, useWatch } from 'antd/es/form/Form';
+import { CRS, ImageOverlay, type MapOptions, TileLayer } from 'leaflet';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import Styles from './index.module.less';
 
-const getBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
+const getBase64 = async (file: File): Promise<string> =>
+  await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
+    reader.onload = () => { resolve(reader.result as string); };
+    reader.onerror = (error) => { reject(error); };
   });
 
 type IFormData =
@@ -74,10 +74,10 @@ const MapManage: FC = () => {
       });
     } else if (formData.sourceType === 'custom') {
       let sourceURL: string;
-      if (formData.sourceFile?.[0]?.originFileObj) {
+      if ((formData.sourceFile?.[0]?.originFileObj) != null) {
         sourceURL = await getBase64(formData.sourceFile[0].originFileObj);
       } else {
-        sourceURL = formData.sourceFile?.[0]?.url || '';
+        sourceURL = formData.sourceFile?.[0]?.url ?? '';
       }
 
       setMapConfig({
@@ -167,10 +167,10 @@ const MapManage: FC = () => {
         });
       } else {
         let sourceURL: string;
-        if (formData.sourceFile?.[0]?.originFileObj) {
+        if ((formData.sourceFile?.[0]?.originFileObj) != null) {
           sourceURL = await getBase64(formData.sourceFile[0].originFileObj);
         } else {
-          sourceURL = formData.sourceFile?.[0]?.url || '';
+          sourceURL = formData.sourceFile?.[0]?.url ?? '';
         }
 
         await services['POST /api/admin/updateMapConfig']({

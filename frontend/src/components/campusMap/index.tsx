@@ -1,17 +1,17 @@
 import { observer } from 'mobx-react';
-import { FC, useEffect, useRef } from 'react';
+import { type FC, useEffect, useRef } from 'react';
 import Style from './index.module.less';
 import leaflet from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import cameraNormal from '../../assets/camera-normal.png';
 import cameraAlarm from '../../assets/camera-alarm.png';
 import cameraOffline from '../../assets/camera-offline.png';
-import ServiceTypes from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 
 export const createCameraIcon = (
   type: 'normal' | 'alarm' | 'offline',
   selected: boolean,
-) => {
+): leaflet.Icon => {
   const iconUrl =
     type === 'normal'
       ? cameraNormal
@@ -38,10 +38,10 @@ export const createCameraIcon = (
 };
 
 const CampusMap: FC<{
-  cameraList?: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'];
+  cameraList?: ServiceTypes['GET /api/user/getCampusState']['res']['data']['cameraList'];
   onCameraClick?: (
     currentCameraId: number,
-    cameraInfo: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0],
+    cameraInfo: ServiceTypes['GET /api/user/getCampusState']['res']['data']['cameraList'][0],
   ) => any;
   selectedCameraIds?: number[];
   className?: string;
@@ -51,12 +51,12 @@ const CampusMap: FC<{
   const mapDivRef = useRef<HTMLDivElement>(null);
   const mapObjRef = useRef<leaflet.Map>();
   const markersRef = useRef<leaflet.LayerGroup<leaflet.Marker>>();
-  const selectedCameraIdsRef = useRef<number[]>(props.selectedCameraIds || []);
+  const selectedCameraIdsRef = useRef<number[]>(props.selectedCameraIds ?? []);
   const onCameraSelectRef = useRef(props.onCameraClick);
 
   useEffect(() => {
     // init map
-    if (mapDivRef.current) {
+    if (mapDivRef.current != null) {
       mapObjRef.current = new leaflet.Map(mapDivRef.current, props.mapConfig);
       props.onInit?.(mapObjRef.current);
       return () => {
@@ -71,13 +71,13 @@ const CampusMap: FC<{
 
   useEffect(() => {
     // render camera markers
-    if (mapObjRef.current && props.cameraList) {
+    if (mapObjRef.current != null && props.cameraList != null) {
       markersRef.current = leaflet.layerGroup();
       props.cameraList.forEach((camera) => {
         const marker = leaflet
           .marker(camera.latlng, {
             icon: createCameraIcon(
-              camera.cameraStatus,
+              camera.cameraStatus as 'normal' | 'offline' | 'alarm',
               selectedCameraIdsRef.current?.includes(camera.cameraID),
             ),
             attribution: JSON.stringify(camera),
@@ -87,7 +87,7 @@ const CampusMap: FC<{
         marker.on('click', () => {
           onCameraSelectRef.current?.(camera.cameraID, camera);
         });
-        markersRef.current && marker.addTo(markersRef.current);
+        markersRef.current != null && marker.addTo(markersRef.current);
       });
       markersRef.current?.addTo(mapObjRef.current);
       return () => {
@@ -98,14 +98,14 @@ const CampusMap: FC<{
 
   useEffect(() => {
     // sync selectedCameraIds with props, and update selected camera icon
-    if (!props.selectedCameraIds) return;
+    if (props.selectedCameraIds == null) return;
     selectedCameraIdsRef.current = props.selectedCameraIds;
     markersRef.current?.eachLayer((marker) => {
-      const theCamera: ServiceTypes['GET /api/getCampusState']['res']['data']['cameraList'][0] =
-        JSON.parse(marker.getAttribution?.() || '');
+      const theCamera: ServiceTypes['GET /api/user/getCampusState']['res']['data']['cameraList'][0] =
+        JSON.parse(marker.getAttribution?.() ?? '');
       (marker as leaflet.Marker).setIcon(
         createCameraIcon(
-          theCamera.cameraStatus,
+          theCamera.cameraStatus as 'normal' | 'offline' | 'alarm',
           selectedCameraIdsRef.current?.includes(theCamera.cameraID),
         ),
       );

@@ -1,9 +1,9 @@
-import ServiceTypes from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 
 const StatusHeader: FC<{
-  data?: ServiceTypes['GET /api/getCampusState']['res']['data'];
+  data?: ServiceTypes['GET /api/user/getCampusState']['res']['data'];
 }> = (props) => {
   const [timeStr, setTimeStr] = useState(new Date().toLocaleString());
   useEffect(() => {

@@ -4,24 +4,29 @@
     "es2021": true
   },
   "extends": [
-    "eslint:recommended",
     "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/jsx-runtime"
+    "plugin:react/jsx-runtime",
+    "standard-with-typescript",
+    "prettier"
   ],
-  "parser": "@typescript-eslint/parser",
+  "overrides": [],
   "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
     "ecmaVersion": "latest",
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
-  "plugins": ["react", "@typescript-eslint"],
+  "plugins": ["react"],
   "rules": {
-    "@typescript-eslint/ban-types": 0,
-    "@typescript-eslint/no-explicit-any": 0
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-misused-promises": "off",
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/strict-boolean-expressions": "off"
   },
-  "settings": { "react": { "version": "detect" } },
-  "ignorePatterns": ["build/**", "dist/**"]
+  "ignorePatterns": [
+    "build/**",
+    "dist/**",
+    "src/assets/**",
+    "src/.umi/**",
+    "src/.umi-production/**"
+  ]
 }

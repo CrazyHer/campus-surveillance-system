@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import Styles from './index.module.less';
 import {
   Button,
@@ -17,18 +17,18 @@ import {
   message,
 } from 'antd';
 import { observer } from 'mobx-react';
-import { AlarmRuleFull } from '@/services/serviceTypes';
 import services from '@/services';
-import { ColumnType } from 'antd/es/table';
+import { type ColumnType } from 'antd/es/table';
 import { useForm } from 'antd/es/form/Form';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
+import type ServiceTypes from '@/services/serviceTypes';
 
 interface EditFormData {
   alarmRuleID: number;
   alarmRuleName: string;
   relatedCameraIds: number[];
   enabled: boolean;
-  algorithmType: 'body' | 'vehicle';
+  algorithmType: string;
   triggerCondition: {
     time: {
       dayOfWeek: number[];
@@ -42,6 +42,8 @@ interface EditFormData {
 }
 
 type AddFormData = Omit<EditFormData, 'alarmRuleID'>;
+type AlarmRuleFull =
+  ServiceTypes['GET /api/admin/getAlarmRuleList']['res']['data'][number];
 
 const AlarmRulesManage: FC = () => {
   const [alarmRuleList, setAlarmRuleList] = useState<AlarmRuleFull[]>([]);
@@ -54,7 +56,7 @@ const AlarmRulesManage: FC = () => {
     [],
   );
 
-  const fetchAlarmRuleList = async () => {
+  const fetchAlarmRuleList = async (): Promise<void> => {
     try {
       setFetchLoading(true);
       setAlarmRuleList(
@@ -62,23 +64,24 @@ const AlarmRulesManage: FC = () => {
       );
     } catch (error) {
       console.error(error);
-      message.error(String(error));
+      void message.error(String(error));
     } finally {
       setFetchLoading(false);
     }
   };
-  const fetchCameraList = async () => {
+
+  const fetchCameraList = async (): Promise<void> => {
     try {
       setCameraList((await services['GET /api/admin/getCameraList']()).data);
     } catch (error) {
       console.error(error);
-      message.error(String(error));
+      void message.error(String(error));
     }
   };
 
   useEffect(() => {
-    fetchAlarmRuleList();
-    fetchCameraList();
+    void fetchAlarmRuleList();
+    void fetchCameraList();
   }, []);
 
   const handleAdd = () => {
@@ -91,7 +94,7 @@ const AlarmRulesManage: FC = () => {
     editForm.resetFields();
     editForm.setFieldsValue({
       ...data,
-      relatedCameraIds: data.relatedCameras?.map((v) => v.cameraID) || [],
+      relatedCameraIds: data.relatedCameras?.map((v) => v.cameraID) ?? [],
       triggerCondition: {
         ...data.triggerCondition,
         time: {
@@ -111,11 +114,11 @@ const AlarmRulesManage: FC = () => {
       await services['POST /api/admin/deleteAlarmRule']({
         alarmRuleID,
       });
-      message.success('删除成功');
-      fetchAlarmRuleList();
+      void message.success('删除成功');
+      void fetchAlarmRuleList();
     } catch (error) {
       console.error(error);
-      message.error(String(error));
+      void message.error(String(error));
     }
   };
 
@@ -141,12 +144,12 @@ const AlarmRulesManage: FC = () => {
           },
         },
       });
-      message.success('添加成功');
+      void message.success('添加成功');
       setAddModalVisible(false);
-      fetchAlarmRuleList();
+      void fetchAlarmRuleList();
     } catch (error) {
       console.error(error);
-      message.error(String(error));
+      void message.error(String(error));
     }
   };
 
@@ -173,16 +176,16 @@ const AlarmRulesManage: FC = () => {
           },
         },
       });
-      message.success('修改成功');
+      void message.success('修改成功');
       setEditModalVisible(false);
-      fetchAlarmRuleList();
+      void fetchAlarmRuleList();
     } catch (error) {
       console.error(error);
-      message.error(String(error));
+      void message.error(String(error));
     }
   };
 
-  const columns: ColumnType<AlarmRuleFull>[] = [
+  const columns: Array<ColumnType<AlarmRuleFull>> = [
     {
       title: '规则ID',
       dataIndex: 'alarmRuleID',
@@ -219,12 +222,19 @@ const AlarmRulesManage: FC = () => {
       title: '操作',
       render: (_v, record) => (
         <Button.Group>
-          <Button type="link" onClick={() => handleEdit(record)}>
+          <Button
+            type="link"
+            onClick={() => {
+              void handleEdit(record);
+            }}
+          >
             配置
           </Button>
           <Popconfirm
             title="确认删除该条规则?"
-            onConfirm={() => handleDelete(record.alarmRuleID)}
+            onConfirm={() => {
+              void handleDelete(record.alarmRuleID);
+            }}
           >
             <Button type="link">删除</Button>
           </Popconfirm>
@@ -346,13 +356,21 @@ const AlarmRulesManage: FC = () => {
         <Modal
           open={addModalVisible}
           title="新增规则"
-          onCancel={() => setAddModalVisible(false)}
+          onCancel={() => {
+            setAddModalVisible(false);
+          }}
           footer={
             <Button.Group>
               <Button type="primary" onClick={handleAddSubmit}>
                 提交
               </Button>
-              <Button onClick={() => setAddModalVisible(false)}>返回</Button>
+              <Button
+                onClick={() => {
+                  setAddModalVisible(false);
+                }}
+              >
+                返回
+              </Button>
             </Button.Group>
           }
         >
@@ -364,13 +382,21 @@ const AlarmRulesManage: FC = () => {
         <Modal
           open={editModalVisible}
           title="配置规则"
-          onCancel={() => setEditModalVisible(false)}
+          onCancel={() => {
+            setEditModalVisible(false);
+          }}
           footer={
             <Button.Group>
               <Button type="primary" onClick={handleEditSubmit}>
                 保存
               </Button>
-              <Button onClick={() => setEditModalVisible(false)}>返回</Button>
+              <Button
+                onClick={() => {
+                  setEditModalVisible(false);
+                }}
+              >
+                返回
+              </Button>
             </Button.Group>
           }
         >

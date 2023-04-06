@@ -1,6 +1,6 @@
 import { Form, Input, Button, message } from 'antd';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import crypto from 'crypto-js';
 import Style from './index.module.less';
@@ -23,7 +23,7 @@ const Login: FC = () => {
   document.title = '智慧园区 · 监控管理系统';
 
   useEffect(() => {
-    if (mobxStore.user.token) {
+    if (mobxStore.user.token.length > 0) {
       // 已登陆，跳转至首页
       history.push('/campusState');
     }
@@ -44,8 +44,8 @@ const Login: FC = () => {
       mobxStore.user.setToken(token);
       mobxStore.user.setUserInfo(userInfo);
     } catch (error) {
-      message.error(`登陆失败`);
       console.error(error);
+      message.error(String(error));
     } finally {
       setLoading(false);
     }

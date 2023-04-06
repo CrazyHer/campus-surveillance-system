@@ -5,9 +5,11 @@ export default class Counter {
   constructor() {
     makeAutoObservable(this);
   }
+
   @action add(value = 1) {
     this.counterValue += value;
   }
+
   @action minus(value = 1) {
     this.counterValue -= value;
   }

@@ -1,10 +1,10 @@
-import ServiceTypes from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useRef, useState } from 'react';
-import hls from 'hls.js';
+import { type FC, useEffect, useRef, useState } from 'react';
+import HLS from 'hls.js';
 import { Button, Card, Descriptions, message, Spin, Table, Tag } from 'antd';
 import Styles from './index.module.less';
-import { ColumnType } from 'antd/es/table';
+import { type ColumnType } from 'antd/es/table';
 import constants from '@/constants';
 import services from '@/services';
 import CameraStatusBadge from '@/components/cameraStatusBadge';
@@ -56,37 +56,41 @@ const CameraInfo: FC<{
     }
   };
 
-  const tableColumns: ColumnType<
-    ServiceTypes['GET /api/user/getCameraInfo']['res']['data']['alarmEvents'][0]
-  >[] = [
+  const tableColumns: Array<
+    ColumnType<
+      ServiceTypes['GET /api/user/getCameraInfo']['res']['data']['alarmEvents'][0]
+    >
+  > = [
     {
       title: '报警时间',
       dataIndex: 'alarmTime',
       render: (value, record) =>
-        record.alarmStatus === constants.alarmStatus.PENDING ? (
-          <div style={{ color: 'red' }}>{value}</div>
-        ) : (
+        record.resolved ? (
           <div>{value}</div>
+        ) : (
+          <div style={{ color: 'red' }}>{value}</div>
         ),
     },
     {
       title: '报警类型',
       render: (_v, record) =>
-        record.alarmStatus === constants.alarmStatus.PENDING ? (
-          <div style={{ color: 'red' }}>{record.alarmRule.alarmRuleName}</div>
-        ) : (
+        record.resolved ? (
           <div>{record.alarmRule.alarmRuleName}</div>
+        ) : (
+          <div style={{ color: 'red' }}>{record.alarmRule.alarmRuleName}</div>
         ),
     },
     {
       title: '操作',
       render: (_value, record) =>
-        record.alarmStatus === 'solved' ? (
+        record.resolved ? (
           '已处理'
         ) : (
           <Button
             type="link"
-            onClick={() => handleResolveAlarm(record.eventID)}
+            onClick={async () => {
+              await handleResolveAlarm(record.eventID);
+            }}
             loading={resolveLoading}
           >
             处理
@@ -100,15 +104,17 @@ const CameraInfo: FC<{
   const videoRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     if (
-      videoRef.current &&
-      data &&
+      videoRef.current != null &&
+      data != null &&
       data?.cameraStatus !== constants.cameraStatus.OFFLINE
     ) {
       setVideoLoading(true);
-      if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
+      if (
+        videoRef.current.canPlayType('application/vnd.apple.mpegurl').length > 0
+      ) {
         videoRef.current.src = data.hlsUrl;
-      } else if (hls.isSupported()) {
-        const hlsPlayer = new hls({ lowLatencyMode: true });
+      } else if (HLS.isSupported()) {
+        const hlsPlayer = new HLS({ lowLatencyMode: true });
         hlsPlayer.loadSource(data.hlsUrl);
         hlsPlayer.attachMedia(videoRef.current);
         return () => {
@@ -138,7 +144,9 @@ const CameraInfo: FC<{
       {data?.cameraStatus !== constants.cameraStatus.OFFLINE && (
         <Spin spinning={videoLoading}>
           <video
-            onPlay={() => setVideoLoading(false)}
+            onPlay={() => {
+              setVideoLoading(false);
+            }}
             onError={handleError}
             ref={videoRef}
             className={Styles.cameraVideo}
@@ -156,7 +164,9 @@ const CameraInfo: FC<{
         </Descriptions.Item>
         <Descriptions.Item label="型号">{data?.cameraModel}</Descriptions.Item>
         <Descriptions.Item label="状态">
-          <CameraStatusBadge status={data?.cameraStatus} />
+          <CameraStatusBadge
+            status={data?.cameraStatus as 'normal' | 'offline' | 'alarm'}
+          />
         </Descriptions.Item>
         <Descriptions.Item label="报警规则">
           {data?.alarmRules.map((rule) => (

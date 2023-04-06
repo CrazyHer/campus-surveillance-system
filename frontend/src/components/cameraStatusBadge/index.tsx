@@ -1,10 +1,10 @@
 import constants from '@/constants';
 import { Badge } from 'antd';
-import { FC } from 'react';
+import { type FC } from 'react';
 
-const CameraStatusBadge: FC<{ status?: 'normal' | 'offline' | 'alarm' }> = (
-  props,
-) => {
+const CameraStatusBadge: FC<{
+  status?: 'normal' | 'offline' | 'alarm';
+}> = (props) => {
   return props.status === constants.cameraStatus.NORMAL ? (
     <Badge status="success" text="正常" />
   ) : props.status === constants.cameraStatus.OFFLINE ? (

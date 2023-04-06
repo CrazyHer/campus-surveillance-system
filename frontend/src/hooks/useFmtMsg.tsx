@@ -1,6 +1,6 @@
-import { FC, useCallback } from 'react';
+import { type FC, useCallback } from 'react';
 import { useIntl } from 'umi';
-import locales from '../locales/zh-CN';
+import type locales from '../locales/zh-CN';
 
 /**
  * 快速使用国际化formatMessage的Hook

@@ -1,19 +1,18 @@
-import constants from '@/constants';
 import services from '@/services';
-import ServiceTypes from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { Button, Card, Descriptions, message, Modal, Table, Tag } from 'antd';
-import { ColumnType } from 'antd/es/table';
+import { type ColumnType } from 'antd/es/table';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import Styles from './index.module.less';
 
 type DataType = ServiceTypes['GET /api/user/getAlarmEvents']['res']['data'][0];
 const Alarms: FC = () => {
-  const columns: ColumnType<DataType>[] = [
+  const columns: Array<ColumnType<DataType>> = [
     { title: '事件ID', dataIndex: 'eventID' },
     { title: '报警源摄像头名称', dataIndex: 'cameraName' },
     { title: '报警类型', dataIndex: 'alarmType' },
@@ -27,13 +26,13 @@ const Alarms: FC = () => {
       title: '状态',
       dataIndex: 'alarmStatus',
       render: (_v, record) =>
-        record.alarmStatus === constants.alarmStatus.PENDING ? (
-          <Tag icon={<ExclamationCircleOutlined />} color="warning">
-            未处理
-          </Tag>
-        ) : (
+        record.resolved ? (
           <Tag icon={<CheckCircleOutlined />} color="success">
             已处理
+          </Tag>
+        ) : (
+          <Tag icon={<ExclamationCircleOutlined />} color="warning">
+            未处理
           </Tag>
         ),
     },
@@ -48,9 +47,7 @@ const Alarms: FC = () => {
             setModalVisible(true);
           }}
         >
-          {record.alarmStatus === constants.alarmStatus.PENDING
-            ? '查看并处理'
-            : '查看'}
+          {record.resolved ? '查看' : '查看并处理'}
         </Button>
       ),
     },
@@ -105,26 +102,36 @@ const Alarms: FC = () => {
       <Modal
         open={modalVisible}
         centered
-        onCancel={() => setModalVisible(false)}
+        onCancel={() => {
+          setModalVisible(false);
+        }}
         okText
         closable={false}
         width={800}
         footer={
           <>
-            {modalContext?.alarmStatus === constants.alarmStatus.PENDING && (
+            {modalContext?.resolved === false && (
               <Button
                 type="primary"
-                onClick={() => handleCheck(modalContext.eventID)}
+                onClick={async () => {
+                  await handleCheck(modalContext.eventID);
+                }}
                 loading={checkLoading}
               >
                 处理
               </Button>
             )}
-            <Button onClick={() => setModalVisible(false)}>关闭</Button>
+            <Button
+              onClick={() => {
+                setModalVisible(false);
+              }}
+            >
+              关闭
+            </Button>
           </>
         }
       >
-        {modalContext && (
+        {modalContext != null && (
           <Descriptions title="报警事件详情" bordered column={2}>
             <Descriptions.Item label="事件ID">
               {modalContext.eventID}
@@ -143,13 +150,13 @@ const Alarms: FC = () => {
             </Descriptions.Item>
 
             <Descriptions.Item label="状态">
-              {modalContext.alarmStatus === constants.alarmStatus.PENDING ? (
-                <Tag icon={<ExclamationCircleOutlined />} color="warning">
-                  未处理
-                </Tag>
-              ) : (
+              {modalContext.resolved ? (
                 <Tag icon={<CheckCircleOutlined />} color="success">
                   已处理
+                </Tag>
+              ) : (
+                <Tag icon={<ExclamationCircleOutlined />} color="warning">
+                  未处理
                 </Tag>
               )}
             </Descriptions.Item>

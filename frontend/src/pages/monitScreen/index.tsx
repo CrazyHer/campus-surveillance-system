@@ -1,12 +1,12 @@
 import services from '@/services';
-import ServiceTypes from '@/services/serviceTypes';
+import type ServiceTypes from '@/services/serviceTypes';
 import { Badge, Card, List, message } from 'antd';
 import { observer } from 'mobx-react';
-import { FC, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 import Styles from './index.module.less';
-import hls from 'hls.js';
+import HLS from 'hls.js';
 import constants from '@/constants';
-const MonitScreen: FC<{}> = () => {
+const MonitScreen: FC = () => {
   const videosRef = useRef<Map<number, HTMLVideoElement>>(new Map());
   const [data, setData] = useState<
     ServiceTypes['GET /api/user/getMonitList']['res']['data']
@@ -29,15 +29,15 @@ const MonitScreen: FC<{}> = () => {
   }, []);
 
   useEffect(() => {
-    const disposeFuncs: (() => void)[] = [];
+    const disposeFuncs: Array<() => void> = [];
     // init video
     data.forEach((item) => {
       const videoRef = videosRef.current?.get(item.cameraID);
-      if (videoRef && !videoRef.src) {
-        if (videoRef.canPlayType('application/vnd.apple.mpegurl')) {
+      if (videoRef && !videoRef.src && !videoRef.currentSrc) {
+        if (videoRef.canPlayType('application/vnd.apple.mpegurl').length > 0) {
           videoRef.src = item.hlsUrl;
-        } else if (hls.isSupported()) {
-          const hlsPlayer = new hls({ lowLatencyMode: true });
+        } else if (HLS.isSupported()) {
+          const hlsPlayer = new HLS({ lowLatencyMode: true });
           hlsPlayer.loadSource(item.hlsUrl);
           hlsPlayer.attachMedia(videoRef);
           disposeFuncs.push(() => {
@@ -50,7 +50,9 @@ const MonitScreen: FC<{}> = () => {
       }
     });
     return () => {
-      disposeFuncs.forEach((func) => func());
+      disposeFuncs.forEach((func) => {
+        func();
+      });
     };
   }, [data, update]);
 
@@ -68,7 +70,9 @@ const MonitScreen: FC<{}> = () => {
           pageSizeOptions: [6, 12, 18, 24],
           showSizeChanger: true,
           showTotal: (total) => `共 ${total} 条`,
-          onChange: () => setUpdate(!update),
+          onChange: () => {
+            setUpdate(!update);
+          },
           hideOnSinglePage: true,
         }}
         renderItem={(item) => (
@@ -92,7 +96,8 @@ const MonitScreen: FC<{}> = () => {
                 muted
                 autoPlay
                 ref={(nodeRef) =>
-                  nodeRef && videosRef.current?.set(item.cameraID, nodeRef)
+                  nodeRef != null &&
+                  videosRef.current?.set(item.cameraID, nodeRef)
                 }
               />
             </Card>

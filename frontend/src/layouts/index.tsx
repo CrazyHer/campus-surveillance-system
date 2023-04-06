@@ -1,5 +1,5 @@
-import { FC, useEffect, useMemo, useState } from 'react';
-import { Layout as AntdLayout, Menu, Dropdown, Avatar, MenuProps } from 'antd';
+import { type FC, useEffect, useMemo, useState } from 'react';
+import { Layout as AntdLayout, Menu, Dropdown, Avatar, type MenuProps } from 'antd';
 import { observer } from 'mobx-react';
 import Style from './index.module.less';
 import { history, Outlet, useLocation } from 'umi';
@@ -75,7 +75,7 @@ const Layout: FC = () => {
                   size="large"
                   icon={<img src={mobxStore.user.avatarURL} alt="头像" />}
                 />
-                <div className={Style['username']}>
+                <div className={Style.username}>
                   {mobxStore.user.nickname}
                 </div>
               </div>

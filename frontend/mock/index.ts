@@ -1,7 +1,7 @@
 import constants from '../src/constants';
-import ServiceTypes from '../src/services/serviceTypes';
+import type ServiceTypes from '../src/services/serviceTypes';
 
-export default {
+const MockApis: { [api in keyof ServiceTypes]: ServiceTypes[api]['res'] } = {
   'POST /api/user/login': {
     data: {
       token: '123',
@@ -44,20 +44,6 @@ export default {
           latlng: [36.666747708247264, 117.13250652184426],
         },
       ],
-      mapConfig: {
-        mapOptions: {
-          attributionControl: false,
-          center: [36.66669, 117.13272],
-          zoom: 17,
-          minZoom: 17,
-          maxZoom: 17,
-          zoomControl: false,
-        },
-        layer: {
-          type: 'tileLayer',
-          url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-        },
-      },
     },
     message: '',
     success: true,
@@ -94,13 +80,13 @@ export default {
           eventID: 1,
           alarmTime: '2020-01-01 00:00:00',
           alarmRule: { alarmRuleID: 1, alarmRuleName: '报警规则1' },
-          alarmStatus: 'pending',
+          resolved: false,
         },
         {
           eventID: 2,
           alarmTime: '2020-01-01 00:00:00',
           alarmRule: { alarmRuleID: 1, alarmRuleName: '报警规则1' },
-          alarmStatus: 'pending',
+          resolved: false,
         },
       ],
     },
@@ -113,7 +99,7 @@ export default {
         eventID: 1,
         alarmTime: '2020-01-01 00:00:00',
         alarmRule: { alarmRuleID: 1, alarmRuleName: '报警规则1' },
-        alarmStatus: 'pending',
+        resolved: false,
         cameraID: 1,
         cameraName: '摄像头1',
         cameraModel: '摄像头型号1',
@@ -125,7 +111,7 @@ export default {
         eventID: 2,
         alarmTime: '2020-01-01 00:00:00',
         alarmRule: { alarmRuleID: 2, alarmRuleName: '报警规则2' },
-        alarmStatus: 'solved',
+        resolved: true,
         cameraID: 1,
         cameraName: '摄像头1',
         cameraModel: '摄像头型号1',
@@ -369,4 +355,6 @@ export default {
     message: '',
     success: true,
   },
-} as { [api in keyof ServiceTypes]: ServiceTypes[api]['res'] };
+};
+
+export default MockApis;
