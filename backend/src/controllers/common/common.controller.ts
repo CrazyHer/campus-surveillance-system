@@ -1,11 +1,15 @@
 import { Body, Controller, ForbiddenException, Post } from '@nestjs/common';
 
 import { UserService } from 'src/services/user/user.service';
+import { UtilsService } from 'src/services/utils/utils.service';
 import { FetchTypes } from 'src/types/fetchTypes';
 
 @Controller()
 export class CommonController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private utilService: UtilsService,
+  ) {}
 
   @Post('/api/user/login')
   async userLogin(
@@ -22,7 +26,9 @@ export class CommonController {
           nickname: user.nickname,
           tel: user.tel ?? '',
           email: user.email ?? '',
-          avatarURL: user.avatarURL,
+          avatarURL: user.avatarFilePath
+            ? this.utilService.filePathToURL(user.avatarFilePath)
+            : '',
         },
       };
     } else throw new ForbiddenException('用户名或密码错误');

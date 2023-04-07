@@ -9,14 +9,25 @@ import { AlarmRule } from './alarm-rule/alarm-rule.entity';
 import { CameraService } from './camera/camera.service';
 import { AlarmEventService } from './alarm-event/alarm-event.service';
 import { AlarmRuleService } from './alarm-rule/alarm-rule.service';
+import { UtilsService } from './utils/utils.service';
+import { MapConfigService } from './map-config/map-config.service';
+import { MapConfig } from './map-config/map-config.entity';
 
-const entities: EntityClassOrSchema[] = [User, Camera, AlarmEvent, AlarmRule];
+const entities: EntityClassOrSchema[] = [
+  User,
+  Camera,
+  AlarmEvent,
+  AlarmRule,
+  MapConfig,
+];
 
 const services: Provider[] = [
   UserService,
   CameraService,
   AlarmEventService,
   AlarmRuleService,
+  UtilsService,
+  MapConfigService,
 ];
 
 @Module({

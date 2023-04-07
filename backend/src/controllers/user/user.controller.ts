@@ -5,6 +5,7 @@ import {
   Get,
   NotFoundException,
   Post,
+  PreconditionFailedException,
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
@@ -14,8 +15,10 @@ import { AuthGuard } from 'src/guards/auth/auth.guard';
 import { RoleGuard } from 'src/guards/role/role.guard';
 import { AlarmEventService } from 'src/services/alarm-event/alarm-event.service';
 import { CameraService } from 'src/services/camera/camera.service';
+import { MapConfigService } from 'src/services/map-config/map-config.service';
 import { User } from 'src/services/user/user.entity';
 import { UserService } from 'src/services/user/user.service';
+import { UtilsService } from 'src/services/utils/utils.service';
 import { FetchTypes } from 'src/types/fetchTypes';
 
 @Controller()
@@ -26,6 +29,8 @@ export class UserController {
     private cameraService: CameraService,
     private alarmEventService: AlarmEventService,
     private userService: UserService,
+    private utilService: UtilsService,
+    private mapConfigService: MapConfigService,
   ) {}
 
   @Get('/api/user/getCampusState')
@@ -178,7 +183,9 @@ export class UserController {
       email: userInfo.email ?? '',
       tel: userInfo.tel ?? '',
       role: userInfo.role,
-      avatarURL: userInfo.avatarURL,
+      avatarURL: userInfo.avatarFilePath
+        ? this.utilService.filePathToURL(userInfo.avatarFilePath)
+        : '',
     };
   }
 
@@ -191,13 +198,56 @@ export class UserController {
       throw new ForbiddenException('Permission denied');
     }
 
+    if (body.avatarURL.startsWith('data:image')) {
+      const avatarFilePath = await this.utilService.writeBase64ImageToFile(
+        body.avatarURL,
+      );
+      await this.userService.updateUser({
+        username: username,
+        nickname: body.nickname,
+        email: body.email,
+        tel: body.tel,
+        avatarFilePath,
+      });
+    } else {
+      await this.userService.updateUser({
+        username: username,
+        nickname: body.nickname,
+        email: body.email,
+        tel: body.tel,
+      });
+    }
+
+    return {};
+  }
+
+  @Post('/api/user/updatePassword')
+  async updatePassword(
+    @Body() body: FetchTypes['POST /api/user/updatePassword']['req'],
+    @UserInfo('username') username: string,
+  ): Promise<FetchTypes['POST /api/user/updatePassword']['res']['data']> {
+    const user = await this.userService.getByUsername(username);
+    if (!user) throw new NotFoundException('User not found');
+
+    if (body.oldPassword !== user.password) {
+      throw new PreconditionFailedException('旧密码不正确');
+    }
+
     await this.userService.updateUser({
       username: username,
-      nickname: body.nickname,
-      email: body.email,
-      tel: body.tel,
-      avatarURL: body.avatarURL,
+      password: body.newPassword,
     });
+
     return {};
+  }
+
+  @Get('/api/user/getMapConfig')
+  async getMapConfig(): Promise<
+    FetchTypes['GET /api/user/getMapConfig']['res']['data']
+  > {
+    const config = await this.mapConfigService.getLatestConfig();
+    if (!config) throw new NotFoundException('Map config not found');
+
+    return config.value;
   }
 }
