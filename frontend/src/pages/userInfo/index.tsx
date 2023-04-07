@@ -16,6 +16,7 @@ import { type FC, useEffect, useState } from 'react';
 import Styles from './index.module.less';
 import ImgCrop from 'antd-img-crop';
 import { type UploadFile } from 'antd/es/upload';
+import mobxStore from '@/mobxStore';
 
 const getBase64 = async (file: File): Promise<string> => {
   return await new Promise((resolve, reject) => {
@@ -59,6 +60,7 @@ const UserInfo: FC = () => {
           uid: res.data.username,
         },
       ]);
+      mobxStore.user.setUserInfo(res.data);
     } catch (error) {
       message.error(String(error));
       console.error(error);
