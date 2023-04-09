@@ -1,0 +1,50 @@
+.map {
+  width: 100%;
+  height: calc(100vh - 64px);
+}
+
+.topPanel {
+  position: absolute;
+  z-index: 800;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 4px;
+  padding: 8px;
+  transition: height 0.2s;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.leftPanel,
+.rightPanel {
+  position: absolute;
+  z-index: 800;
+  display: flex;
+  top: 64px;
+}
+.leftPanel {
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+}
+.rightPanel {
+  right: 16px;
+}
+.hide {
+  height: 0;
+}
+.cameraInfoCard {
+  max-width: 360px;
+}
+.cameraVideo {
+  width: 100%;
+  height: 220px;
+}
+.alarmEventsTable {
+  width: 100%;
+}
