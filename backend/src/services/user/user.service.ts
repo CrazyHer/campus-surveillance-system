@@ -12,7 +12,9 @@ export class UserService {
   ) {}
 
   async getUserList(): Promise<User[]> {
-    return await this.userRepo.find({ select: { password: false } });
+    return await this.userRepo.find({
+      select: { password: false },
+    });
   }
 
   async authLogin(username: string, password: string): Promise<User | null> {
@@ -30,5 +32,13 @@ export class UserService {
   async updateUser(user: Partial<User>) {
     if (!user.username) return;
     await this.userRepo.update({ username: user.username }, user);
+  }
+
+  async addUser(user: Partial<User>) {
+    return await this.userRepo.insert(user);
+  }
+
+  async deleteUser(username: string) {
+    await this.userRepo.softDelete({ username });
   }
 }

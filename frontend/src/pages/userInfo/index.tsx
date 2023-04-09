@@ -17,6 +17,8 @@ import Styles from './index.module.less';
 import ImgCrop from 'antd-img-crop';
 import { type UploadFile } from 'antd/es/upload';
 import mobxStore from '@/mobxStore';
+import constants from '@/constants';
+import CryptoJS from 'crypto-js';
 
 const getBase64 = async (file: File): Promise<string> => {
   return await new Promise((resolve, reject) => {
@@ -97,7 +99,16 @@ const UserInfo: FC = () => {
 
   const handlePasswordSubmit = async (values: PasswordForm) => {
     try {
-      await services['POST /api/user/updatePassword'](values);
+      await services['POST /api/user/updatePassword']({
+        oldPassword: CryptoJS.HmacSHA256(
+          values.oldPassword,
+          constants.SHA256KEY,
+        ).toString(CryptoJS.enc.Base64),
+        newPassword: CryptoJS.HmacSHA256(
+          values.newPassword,
+          constants.SHA256KEY,
+        ).toString(CryptoJS.enc.Base64),
+      });
       message.success('修改成功');
       passwordForm.resetFields();
     } catch (error) {

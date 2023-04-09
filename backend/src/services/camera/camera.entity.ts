@@ -1,10 +1,13 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { AlarmEvent } from '../alarm-event/alarm-event.entity';
 import { AlarmRule } from '../alarm-rule/alarm-rule.entity';
@@ -17,28 +20,34 @@ export class Camera {
   @Column()
   name: string;
 
-  @Column()
-  status: string;
+  @Column({ default: 'offline' })
+  status: 'normal' | 'offline' | 'alarm';
 
-  @Column({ nullable: true })
+  @Column({ default: '' })
   hlsUrl: string;
 
-  @Column()
-  latitude: string;
+  @Column({ type: 'double' })
+  latitude: number;
+
+  @Column({ type: 'double' })
+  longitude: number;
 
   @Column()
-  longitude: string;
-
-  @Column({ nullable: true })
   model: string;
 
-  @Column({ type: 'bool', default: false })
-  deleted: boolean;
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @OneToMany(() => AlarmEvent, (alarmEvent) => alarmEvent.sourceCamera)
   @JoinColumn()
-  alarmEvents: AlarmEvent[];
+  alarmEvents?: AlarmEvent[];
 
   @ManyToMany(() => AlarmRule, (alarmRule) => alarmRule.relatedCameras)
-  alarmRules: AlarmRule[];
+  alarmRules?: AlarmRule[];
 }

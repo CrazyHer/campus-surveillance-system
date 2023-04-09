@@ -1,31 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import { User } from 'src/services/user/user.entity';
-
 // Stay consistent with the frontend/src/services/serviceTypes.ts
-interface AlarmRuleBase {
-  alarmRuleID: number;
-  alarmRuleName: string;
-}
-
-interface AlarmRuleFull extends AlarmRuleBase {
-  relatedCameras: {
-    cameraName: string;
-    cameraID: number;
-  }[];
-  enabled: boolean;
-  algorithmType: string;
-  triggerCondition: {
-    time: {
-      dayOfWeek: number[];
-      timeRange: [string, string];
-    };
-    count: {
-      min: number;
-      max: number;
-    };
-  };
-}
 
 export interface FetchTypes {
   'POST /api/user/login': {
@@ -75,11 +50,17 @@ export interface FetchTypes {
         hlsUrl: string;
         latlng: [number, number];
         cameraModel: string;
-        alarmRules: AlarmRuleBase[];
+        alarmRules: {
+          alarmRuleID: number;
+          alarmRuleName: string;
+        }[];
         alarmEvents: {
           eventID: number;
           alarmTime: string;
-          alarmRule: AlarmRuleBase;
+          alarmRule: {
+            alarmRuleID: number;
+            alarmRuleName: string;
+          };
           resolved: boolean;
         }[];
       };
@@ -99,7 +80,10 @@ export interface FetchTypes {
       data: {
         eventID: number;
         alarmTime: string;
-        alarmRule: AlarmRuleBase;
+        alarmRule: {
+          alarmRuleID: number;
+          alarmRuleName: string;
+        };
         resolved: boolean;
         cameraID: number;
         cameraName: string;
@@ -228,7 +212,10 @@ export interface FetchTypes {
         hlsUrl: string;
         latlng: [number, number];
         cameraModel: string;
-        alarmRules: AlarmRuleBase[];
+        alarmRules: {
+          alarmRuleID: number;
+          alarmRuleName: string;
+        }[];
       }[];
       message: string;
       success: boolean;
@@ -274,14 +261,46 @@ export interface FetchTypes {
   'GET /api/admin/getAlarmRuleList': {
     req: void;
     res: {
-      data: AlarmRuleFull[];
+      data: {
+        alarmRuleID: number;
+        alarmRuleName: string;
+        relatedCameras: {
+          cameraName: string;
+          cameraID: number;
+        }[];
+        enabled: boolean;
+        algorithmType: 'body' | 'vehicle';
+        triggerCondition: {
+          time: {
+            dayOfWeek: number[];
+            timeRange: [string, string];
+          };
+          count: {
+            min: number;
+            max: number;
+          };
+        };
+      }[];
       message: string;
       success: boolean;
     };
   };
   'POST /api/admin/addAlarmRule': {
-    req: Omit<AlarmRuleFull, 'alarmRuleID' | 'relatedCameras'> & {
+    req: {
       relatedCameraIds: number[];
+      alarmRuleName: string;
+      enabled: boolean;
+      algorithmType: 'body' | 'vehicle';
+      triggerCondition: {
+        time: {
+          dayOfWeek: number[];
+          timeRange: [string, string];
+        };
+        count: {
+          min: number;
+          max: number;
+        };
+      };
     };
     res: {
       data: {};
@@ -290,8 +309,22 @@ export interface FetchTypes {
     };
   };
   'POST /api/admin/updateAlarmRule': {
-    req: Omit<AlarmRuleFull, 'relatedCameras'> & {
+    req: {
+      alarmRuleID: number;
+      alarmRuleName: string;
       relatedCameraIds: number[];
+      enabled: boolean;
+      algorithmType: 'body' | 'vehicle';
+      triggerCondition: {
+        time: {
+          dayOfWeek: number[];
+          timeRange: [string, string];
+        };
+        count: {
+          min: number;
+          max: number;
+        };
+      };
     };
     res: {
       data: {};

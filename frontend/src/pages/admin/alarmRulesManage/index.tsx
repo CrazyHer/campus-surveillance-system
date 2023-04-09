@@ -22,13 +22,14 @@ import { type ColumnType } from 'antd/es/table';
 import { useForm } from 'antd/es/form/Form';
 import dayjs, { type Dayjs } from 'dayjs';
 import type ServiceTypes from '@/services/serviceTypes';
+import constants from '@/constants';
 
 interface EditFormData {
   alarmRuleID: number;
   alarmRuleName: string;
   relatedCameraIds: number[];
   enabled: boolean;
-  algorithmType: string;
+  algorithmType: 'body' | 'vehicle';
   triggerCondition: {
     time: {
       dayOfWeek: number[];
@@ -216,7 +217,9 @@ const AlarmRulesManage: FC = () => {
       title: '监控算法',
       dataIndex: 'algorithmType',
       render: (_v, record) =>
-        record.algorithmType === 'body' ? '人体检测' : '车辆检测',
+        record.algorithmType === constants.alarmRuleAlgorithmType.BODY
+          ? '人体检测'
+          : '车辆检测',
     },
     {
       title: '操作',

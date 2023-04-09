@@ -16,7 +16,6 @@ import { RoleGuard } from 'src/guards/role/role.guard';
 import { AlarmEventService } from 'src/services/alarm-event/alarm-event.service';
 import { CameraService } from 'src/services/camera/camera.service';
 import { MapConfigService } from 'src/services/map-config/map-config.service';
-import { User } from 'src/services/user/user.entity';
 import { UserService } from 'src/services/user/user.service';
 import { UtilsService } from 'src/services/utils/utils.service';
 import { FetchTypes } from 'src/types/fetchTypes';
@@ -29,7 +28,7 @@ export class UserController {
     private cameraService: CameraService,
     private alarmEventService: AlarmEventService,
     private userService: UserService,
-    private utilService: UtilsService,
+    private utilsService: UtilsService,
     private mapConfigService: MapConfigService,
   ) {}
 
@@ -51,7 +50,7 @@ export class UserController {
       cameraAlarm = 0;
 
     const cameraListRes = cameraList.map((camera) => {
-      if (camera.status === 'online') cameraOnline++;
+      if (camera.status === 'normal') cameraOnline++;
       if (camera.status === 'alarm') cameraAlarm++;
       return {
         cameraName: camera.name,
@@ -78,7 +77,7 @@ export class UserController {
     @Body('cameraID')
     cameraID: FetchTypes['GET /api/user/getCameraInfo']['req']['cameraID'],
   ): Promise<FetchTypes['GET /api/user/getCameraInfo']['res']['data']> {
-    const camera = await this.cameraService.getById(cameraID);
+    const camera = await this.cameraService.getById(cameraID, true);
     if (!camera) throw new NotFoundException('Camera not found');
 
     return {
@@ -91,19 +90,21 @@ export class UserController {
         number,
       ],
       cameraModel: camera.model,
-      alarmRules: camera.alarmRules.map((rule) => ({
-        alarmRuleID: rule.id,
-        alarmRuleName: rule.name,
-      })),
-      alarmEvents: camera.alarmEvents.map((event) => ({
-        eventID: event.id,
-        alarmTime: dayjs(event.time).format('yyyy-MM-dd HH:mm:ss'),
-        alarmRule: {
-          alarmRuleID: event.alarmRule.id,
-          alarmRuleName: event.alarmRule.name,
-        },
-        resolved: event.resolved,
-      })),
+      alarmRules:
+        camera.alarmRules?.map((rule) => ({
+          alarmRuleID: rule.id,
+          alarmRuleName: rule.name,
+        })) ?? [],
+      alarmEvents:
+        camera.alarmEvents?.map((event) => ({
+          eventID: event.id,
+          alarmTime: dayjs(event.time).format('yyyy-MM-dd HH:mm:ss'),
+          alarmRule: {
+            alarmRuleID: event.alarmRule.id,
+            alarmRuleName: event.alarmRule.name,
+          },
+          resolved: event.resolved,
+        })) ?? [],
     };
   }
 
@@ -124,20 +125,22 @@ export class UserController {
     if (cameraID) {
       const camera = await this.cameraService.getById(cameraID);
       if (!camera) throw new NotFoundException('Camera not found');
-      return camera.alarmEvents.map((event) => ({
-        eventID: event.id,
-        alarmTime: dayjs(event.time).format('yyyy-MM-dd HH:mm:ss'),
-        alarmRule: {
-          alarmRuleID: event.alarmRule.id,
-          alarmRuleName: event.alarmRule.name,
-        },
-        resolved: event.resolved,
-        cameraID: camera.id,
-        cameraName: camera.name,
-        cameraLatlng: [Number(camera.latitude), Number(camera.longitude)],
-        cameraModel: camera.model,
-        alarmPicUrl: event.picUrl,
-      }));
+      return (
+        camera.alarmEvents?.map((event) => ({
+          eventID: event.id,
+          alarmTime: dayjs(event.time).format('yyyy-MM-dd HH:mm:ss'),
+          alarmRule: {
+            alarmRuleID: event.alarmRule.id,
+            alarmRuleName: event.alarmRule.name,
+          },
+          resolved: event.resolved,
+          cameraID: camera.id,
+          cameraName: camera.name,
+          cameraLatlng: [Number(camera.latitude), Number(camera.longitude)],
+          cameraModel: camera.model,
+          alarmPicUrl: event.picUrl,
+        })) ?? []
+      );
     } else {
       return (await this.alarmEventService.getList()).map((event) => ({
         eventID: event.id,
@@ -184,7 +187,7 @@ export class UserController {
       tel: userInfo.tel ?? '',
       role: userInfo.role,
       avatarURL: userInfo.avatarFilePath
-        ? this.utilService.filePathToURL(userInfo.avatarFilePath)
+        ? this.utilsService.filePathToURL(userInfo.avatarFilePath)
         : '',
     };
   }
@@ -199,7 +202,7 @@ export class UserController {
     }
 
     if (body.avatarURL.startsWith('data:image')) {
-      const avatarFilePath = await this.utilService.writeBase64ImageToFile(
+      const avatarFilePath = await this.utilsService.writeBase64ImageToFile(
         body.avatarURL,
       );
       await this.userService.updateUser({
@@ -248,6 +251,29 @@ export class UserController {
     const config = await this.mapConfigService.getLatestConfig();
     if (!config) throw new NotFoundException('Map config not found');
 
-    return config.value;
+    return {
+      layer:
+        config.layerType === 'imageOverlay'
+          ? {
+              type: 'imageOverlay',
+              url: this.utilsService.filePathToURL(config.layerUrlOrPath),
+              bounds: config.imageLayerBounds as [
+                [number, number],
+                [number, number],
+              ],
+            }
+          : {
+              type: 'tileLayer',
+              url: config.layerUrlOrPath,
+            },
+      mapOptions: {
+        center: config.mapCenter,
+        zoom: config.mapZoom,
+        minZoom: config.mapZoom,
+        maxZoom: config.mapZoom,
+        attributionControl: false,
+        zoomControl: false,
+      },
+    };
   }
 }

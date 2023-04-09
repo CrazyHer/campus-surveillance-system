@@ -1,11 +1,14 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Camera } from '../camera/camera.entity';
 import { AlarmRule } from '../alarm-rule/alarm-rule.entity';
@@ -23,6 +26,15 @@ export class AlarmEvent {
 
   @Column()
   picUrl: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @ManyToOne(() => Camera, (camera) => camera.alarmEvents)
   sourceCamera: Camera;

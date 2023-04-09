@@ -1,9 +1,13 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Camera } from '../camera/camera.entity';
 import { AlarmEvent } from '../alarm-event/alarm-event.entity';
@@ -17,10 +21,10 @@ export class AlarmRule {
   name: string;
 
   @Column()
-  enbaled: boolean;
+  enabled: boolean;
 
   @Column()
-  algorithmType: string;
+  algorithmType: 'body' | 'vehicle';
 
   @Column({ type: 'json' })
   triggerDayOfWeek: number[];
@@ -37,9 +41,19 @@ export class AlarmRule {
   @Column({ type: 'int' })
   triggerCountMax: number;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
   @ManyToMany(() => Camera, (camera) => camera.alarmRules)
-  relatedCameras: Camera[];
+  @JoinTable()
+  relatedCameras?: Camera[];
 
   @OneToMany(() => AlarmEvent, (alarmEvent) => alarmEvent.alarmRule)
-  alarmEvents: AlarmEvent[];
+  alarmEvents?: AlarmEvent[];
 }

@@ -33,7 +33,12 @@ const MonitScreen: FC = () => {
     // init video
     data.forEach((item) => {
       const videoRef = videosRef.current?.get(item.cameraID);
-      if (videoRef && !videoRef.src && !videoRef.currentSrc) {
+      if (
+        videoRef &&
+        !videoRef.src &&
+        !videoRef.currentSrc &&
+        item.cameraStatus !== constants.cameraStatus.OFFLINE
+      ) {
         if (videoRef.canPlayType('application/vnd.apple.mpegurl').length > 0) {
           videoRef.src = item.hlsUrl;
         } else if (HLS.isSupported()) {
@@ -94,7 +99,7 @@ const MonitScreen: FC = () => {
                 className={Styles.video}
                 controls
                 muted
-                autoPlay
+                autoPlay={item.cameraStatus !== constants.cameraStatus.OFFLINE}
                 ref={(nodeRef) =>
                   nodeRef != null &&
                   videosRef.current?.set(item.cameraID, nodeRef)
