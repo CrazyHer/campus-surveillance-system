@@ -104,8 +104,7 @@ const MockApis: { [api in keyof ServiceTypes]: ServiceTypes[api]['res'] } = {
         cameraName: '摄像头1',
         cameraModel: '摄像头型号1',
         cameraLatlng: [36.666394717516695, 117.13263524798919],
-        alarmPicUrl:
-          'https://p3.itc.cn/images01/20200823/1b25064515b946838b0794507a647cf0.jpeg',
+        alarmPicUrl: 'http://localhost:3000/public/ai-test1.jpg',
       },
       {
         eventID: 2,
@@ -113,8 +112,8 @@ const MockApis: { [api in keyof ServiceTypes]: ServiceTypes[api]['res'] } = {
         alarmRule: { alarmRuleID: 2, alarmRuleName: '报警规则2' },
         resolved: true,
         cameraID: 1,
-        cameraName: '摄像头1',
-        cameraModel: '摄像头型号1',
+        cameraName: '摄像头2',
+        cameraModel: '摄像头型号2',
         cameraLatlng: [36.666394717516695, 117.13263524798919],
         alarmPicUrl:
           'https://p3.itc.cn/images01/20200823/1b25064515b946838b0794507a647cf0.jpeg',

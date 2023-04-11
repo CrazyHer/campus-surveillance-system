@@ -16,17 +16,27 @@ import {
   type UploadFile,
 } from 'antd';
 import { type FormProps, useForm, useWatch } from 'antd/es/form/Form';
-import { CRS, ImageOverlay, type MapOptions, TileLayer } from 'leaflet';
+import {
+  CRS,
+  ImageOverlay,
+  type MapOptions,
+  TileLayer,
+  type LeafletMouseEvent,
+} from 'leaflet';
 import { observer } from 'mobx-react';
-import { type FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState, useRef } from 'react';
 import Styles from './index.module.less';
 
 const getBase64 = async (file: File): Promise<string> =>
   await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => { resolve(reader.result as string); };
-    reader.onerror = (error) => { reject(error); };
+    reader.onload = () => {
+      resolve(reader.result as string);
+    };
+    reader.onerror = (error) => {
+      reject(error);
+    };
   });
 
 type IFormData =
@@ -74,7 +84,7 @@ const MapManage: FC = () => {
       });
     } else if (formData.sourceType === 'custom') {
       let sourceURL: string;
-      if ((formData.sourceFile?.[0]?.originFileObj) != null) {
+      if (formData.sourceFile?.[0]?.originFileObj != null) {
         sourceURL = await getBase64(formData.sourceFile[0].originFileObj);
       } else {
         sourceURL = formData.sourceFile?.[0]?.url ?? '';
@@ -167,7 +177,7 @@ const MapManage: FC = () => {
         });
       } else {
         let sourceURL: string;
-        if ((formData.sourceFile?.[0]?.originFileObj) != null) {
+        if (formData.sourceFile?.[0]?.originFileObj != null) {
           sourceURL = await getBase64(formData.sourceFile[0].originFileObj);
         } else {
           sourceURL = formData.sourceFile?.[0]?.url ?? '';
@@ -211,6 +221,23 @@ const MapManage: FC = () => {
     e?.preventDefault();
     fetchAndInitData();
   };
+
+  const handleMapClick = (e: LeafletMouseEvent) => {
+    const { lat, lng } = e.latlng;
+    if (sourceType === 'osm') {
+      form.setFieldsValue({
+        centerLat: lat,
+        centerLnt: lng,
+      });
+    } else if (sourceType === 'custom') {
+      form.setFieldsValue({
+        centerY: lat,
+        centerX: lng,
+      });
+    }
+  };
+  const handleMapClickRef = useRef(handleMapClick);
+  handleMapClickRef.current = handleMapClick;
 
   return (
     <Spin spinning={fetchLoading}>
@@ -388,8 +415,15 @@ const MapManage: FC = () => {
           </Form>
 
           <Form layout="vertical">
-            <Form.Item label="地图预览">
-              <CampusMap className={Styles.campusMap} mapConfig={mapConfig} />
+            <Form.Item
+              label="地图预览"
+              help="提示：单击地图可设置对应位置为中心坐标"
+            >
+              <CampusMap
+                className={Styles.campusMap}
+                mapConfig={mapConfig}
+                onInit={(map) => map.on('click', handleMapClickRef?.current)}
+              />
             </Form.Item>
           </Form>
         </Card>

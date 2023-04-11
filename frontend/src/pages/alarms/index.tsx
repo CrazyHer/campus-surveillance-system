@@ -15,7 +15,11 @@ const Alarms: FC = () => {
   const columns: Array<ColumnType<DataType>> = [
     { title: '事件ID', dataIndex: 'eventID' },
     { title: '报警源摄像头名称', dataIndex: 'cameraName' },
-    { title: '报警类型', dataIndex: 'alarmType' },
+    {
+      title: '报警类型',
+      dataIndex: 'alarmType',
+      render: (_v, record) => <Tag>{record.alarmRule.alarmRuleName}</Tag>,
+    },
     {
       title: '监控位置',
       dataIndex: 'cameraLatLng',

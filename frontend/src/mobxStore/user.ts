@@ -4,7 +4,7 @@ export default class User {
   token = localStorage.getItem('user.token') ?? '';
   role = localStorage.getItem('user.role') ?? '';
   avatarURL = localStorage.getItem('user.avatarURL') ?? '';
-  nickname = localStorage.getItem('user.username') ?? '';
+  nickname = localStorage.getItem('user.nickname') ?? '';
 
   constructor() {
     makeAutoObservable(this);
