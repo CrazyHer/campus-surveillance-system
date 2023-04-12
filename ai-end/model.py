@@ -1,34 +1,39 @@
 from ultralytics import YOLO
-import cv2
 
 
 class YOLOModel:
     __model = None
+    conf = 0.25
 
-    def __init__(self):
+    def __init__(self, conf=0.25):
+        self.conf = conf
         self.__model = YOLO(model="./yolov8n.pt", task="detect")
 
     def detectImage(self, image):
-        result = self.__model.predict(source=image, verbose=False)[0]
+        result = self.__model.predict(
+            source=image, verbose=False, conf=self.conf, line_thickness=1
+        )[0]
+        result.clsCount = self.getClsCount(result)
+        return result
+
+    def detectVideo(self, video):
+        result = self.__model.predict(
+            source=video,
+            verbose=False,
+            stream=True,
+            line_thickness=1,
+            conf=self.conf,
+        )
+        return result
+
+    def getClsCount(self, result):
         clsCount = dict()
         detectedCls = result.boxes.cls
         for clsValue in detectedCls.unique():
             clsName = str(result.names[int(clsValue)])
             count = int((detectedCls == clsValue).sum())
             clsCount[clsName] = count
-        result.clsCount = clsCount
-        return result
+        return clsCount
 
-    def detectVideo(self, video, onFrame=lambda frameResult: None):
-        result = self.__model.predict(source=video, verbose=False, stream=True)
-        for frame in result:
-            clsCount = dict()
-            detectedCls = frame.boxes.cls
-            for clsValue in detectedCls.unique():
-                clsName = str(frame.names[int(clsValue)])
-                count = int((detectedCls == clsValue).sum())
-                clsCount[clsName] = count
-            frame.clsCount = clsCount
-            onFrame(frame)
 
-        return result
+pass

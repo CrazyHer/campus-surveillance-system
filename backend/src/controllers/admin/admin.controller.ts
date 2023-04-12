@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Post,
   SetMetadata,
   UseGuards,
@@ -16,6 +17,7 @@ import { MapConfigService } from 'src/services/map-config/map-config.service';
 import { UserService } from 'src/services/user/user.service';
 import { UtilsService } from 'src/services/utils/utils.service';
 import { FetchTypes } from 'src/types/fetchTypes';
+import { AiEndGateway } from 'src/ws-gateways/ai-end/ai-end.gateway';
 
 @Controller()
 @SetMetadata('role', 'admin')
@@ -27,6 +29,7 @@ export class AdminController {
     private cameraService: CameraService,
     private alarmRuleService: AlarmRuleService,
     private userService: UserService,
+    private aiEndGateway: AiEndGateway,
   ) {}
 
   @Post('/api/admin/updateMapConfig')
@@ -116,6 +119,7 @@ export class AdminController {
       }),
     });
 
+    this.aiEndGateway.notifyAlarmRuleChange(body.cameraID);
     return {};
   }
 
@@ -124,7 +128,7 @@ export class AdminController {
     @Body() body: FetchTypes['POST /api/admin/deleteCamera']['req'],
   ): Promise<FetchTypes['POST /api/admin/deleteCamera']['res']['data']> {
     await this.cameraService.deleteCamera(body.cameraID);
-
+    await this.aiEndGateway.disconnectClient(body.cameraID);
     return {};
   }
 
@@ -168,6 +172,7 @@ export class AdminController {
       relatedCameras: body.relatedCameraIds.map((id) => {
         const camera = new Camera();
         camera.id = id;
+        this.aiEndGateway.notifyAlarmRuleChange(id);
         return camera;
       }),
       triggerDayOfWeek: body.triggerCondition.time.dayOfWeek,
@@ -192,6 +197,7 @@ export class AdminController {
       relatedCameras: body.relatedCameraIds.map((id) => {
         const camera = new Camera();
         camera.id = id;
+        this.aiEndGateway.notifyAlarmRuleChange(id);
         return camera;
       }),
       triggerDayOfWeek: body.triggerCondition.time.dayOfWeek,
@@ -208,6 +214,12 @@ export class AdminController {
   async deleteAlarmRule(
     @Body() body: FetchTypes['POST /api/admin/deleteAlarmRule']['req'],
   ): Promise<FetchTypes['POST /api/admin/deleteAlarmRule']['res']['data']> {
+    const rule = await this.alarmRuleService.getById(body.alarmRuleID, true);
+    if (!rule) throw new NotFoundException('Alarm rule not found');
+
+    rule?.relatedCameras?.forEach((camera) => {
+      this.aiEndGateway.notifyAlarmRuleChange(camera.id);
+    });
     await this.alarmRuleService.deleteRule(body.alarmRuleID);
 
     return {};

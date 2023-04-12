@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { CacheKey, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Camera } from './camera.entity';
@@ -9,19 +9,26 @@ export class CameraService {
     @InjectRepository(Camera) private cameraRepo: Repository<Camera>,
   ) {}
 
-  async getList(withAlarmRules = false): Promise<Camera[]> {
+  async getList(
+    withAlarmRules = false,
+    withAlarmEvents = false,
+  ): Promise<Camera[]> {
     return await this.cameraRepo.find({
-      relations: { alarmRules: withAlarmRules },
+      relations: { alarmRules: withAlarmRules, alarmEvents: withAlarmEvents },
     });
   }
 
   async getById(
     cameraID: number,
     withAlarmRules = false,
+    withAlarmEvents = false,
   ): Promise<Camera | null> {
     return await this.cameraRepo.findOne({
       where: { id: cameraID },
-      relations: { alarmRules: withAlarmRules },
+      relations: {
+        alarmRules: withAlarmRules,
+        alarmEvents: withAlarmEvents ? { alarmRule: true } : false,
+      },
     });
   }
 

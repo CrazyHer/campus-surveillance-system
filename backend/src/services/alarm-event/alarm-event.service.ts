@@ -10,8 +10,32 @@ export class AlarmEventService {
     private alarmEventRepo: Repository<AlarmEvent>,
   ) {}
 
-  async getList() {
-    return await this.alarmEventRepo.find();
+  async getList(
+    withSourceCamera = false,
+    withAlarmRule = false,
+  ): Promise<AlarmEvent[]> {
+    return await this.alarmEventRepo.find({
+      relations: {
+        sourceCamera: withSourceCamera,
+        alarmRule: withAlarmRule,
+      },
+      order: { id: 'DESC' },
+    });
+  }
+
+  async getByCameraId(
+    cameraId: number,
+    withSourceCamera = false,
+    withAlarmRule = false,
+  ) {
+    return await this.alarmEventRepo.find({
+      where: { sourceCamera: { id: cameraId } },
+      relations: {
+        sourceCamera: withSourceCamera,
+        alarmRule: withAlarmRule,
+      },
+      order: { id: 'DESC' },
+    });
   }
 
   async getResolvedList() {
@@ -28,5 +52,9 @@ export class AlarmEventService {
 
   async resolve(id: number) {
     return await this.alarmEventRepo.update({ id }, { resolved: true });
+  }
+
+  async addEvent(event: Partial<AlarmEvent>) {
+    return await this.alarmEventRepo.insert(event);
   }
 }

@@ -5,8 +5,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -18,14 +16,11 @@ export class AlarmEvent {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column()
-  time: Date;
-
   @Column({ type: 'bool', default: false })
   resolved: boolean;
 
   @Column()
-  picUrl: string;
+  picFilePath: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -37,9 +32,9 @@ export class AlarmEvent {
   deletedAt: Date;
 
   @ManyToOne(() => Camera, (camera) => camera.alarmEvents)
-  sourceCamera: Camera;
+  sourceCamera?: Camera;
 
   @ManyToOne(() => AlarmRule, (alarmRule) => alarmRule.alarmEvents)
   @JoinColumn()
-  alarmRule: AlarmRule;
+  alarmRule?: AlarmRule;
 }
