@@ -20,11 +20,14 @@ export class Camera {
   @Column()
   name: string;
 
-  @Column({ default: 'offline' })
-  status: 'normal' | 'offline' | 'alarm';
+  @Column({ type: 'bool', default: false })
+  online: boolean;
 
   @Column({ default: '' })
   hlsUrl: string;
+
+  @Column({ default: '' })
+  rtmpUrl: string;
 
   @Column({ type: 'double' })
   latitude: number;

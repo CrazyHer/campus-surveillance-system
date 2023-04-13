@@ -20,7 +20,7 @@ import { WsGatewaysModule } from './ws-gateways/ws-gateways.module';
         password: configService.get('MYSQL_PASSWORD'),
         synchronize: true,
         autoLoadEntities: true,
-        timezone: 'UTC',
+        timezone: 'Z',
       }),
     }),
     CacheModule.register({ isGlobal: true }),

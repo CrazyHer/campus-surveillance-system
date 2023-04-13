@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AlarmEvent } from './alarm-event.entity';
 import { Repository } from 'typeorm';
+import { CameraService } from '../camera/camera.service';
 
 @Injectable()
 export class AlarmEventService {
   constructor(
     @InjectRepository(AlarmEvent)
     private alarmEventRepo: Repository<AlarmEvent>,
+    private cameraService: CameraService,
   ) {}
 
   async getList(
@@ -51,7 +53,7 @@ export class AlarmEventService {
   }
 
   async resolve(id: number) {
-    return await this.alarmEventRepo.update({ id }, { resolved: true });
+    await this.alarmEventRepo.update({ id }, { resolved: true });
   }
 
   async addEvent(event: Partial<AlarmEvent>) {

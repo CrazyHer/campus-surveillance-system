@@ -210,6 +210,7 @@ export interface FetchTypes {
         cameraID: number;
         cameraStatus: string;
         hlsUrl: string;
+        rtmpUrl: string;
         latlng: [number, number];
         cameraModel: string;
         alarmRules: {
@@ -227,6 +228,8 @@ export interface FetchTypes {
       latlng: [number, number];
       cameraModel: string;
       alarmRuleIDs: number[];
+      hlsUrl: string;
+      rtmpUrl: string;
     };
     res: {
       data: {};
@@ -241,6 +244,8 @@ export interface FetchTypes {
       latlng: [number, number];
       cameraModel: string;
       alarmRuleIDs: number[];
+      hlsUrl: string;
+      rtmpUrl: string;
     };
     res: {
       data: {};

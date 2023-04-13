@@ -1,3 +1,4 @@
+from typing import Any
 import socketio
 import hashlib
 import hmac
@@ -11,13 +12,18 @@ from datetime import datetime, timedelta
 class WSClient:
     __SHA256KEY = "campus-surveillance-system".encode("utf-8")
     sio = socketio.AsyncClient()
-    connected = False
     serverUrl = None
+
+    connected = False
+    ready = False
+    onReady = lambda: None
+
     username = None
     password = None
     cameraID = None
-    hlsUrl = None
 
+    rtmpUrl = None
+    alarmRules = None
     """
     @type alarmRule: [{
         'id': 1,
@@ -31,17 +37,19 @@ class WSClient:
         'triggerCountMax': -1
         }]
     """
-    alarmRule = None
 
+    alarmThrottle = {}
     """
     @type alarmThrottle: {
         [ alarmRuleID:str ]: datetime
     }
     """
-    alarmThrottle = {}
+
     throttleTime = 60  # seconds
 
-    def __init__(self, serverUrl, username, password, cameraID, hlsUrl) -> None:
+    def __init__(
+        self, serverUrl, username, password, cameraID, onReady=lambda: Any
+    ) -> None:
         self.serverUrl = serverUrl
         self.username = username
         self.password = base64.b64encode(
@@ -50,13 +58,14 @@ class WSClient:
             ).digest()
         ).decode("utf-8")
         self.cameraID = cameraID
-        self.hlsUrl = hlsUrl
+        self.onReady = onReady
 
-        self.sio.on("alarmRuleChange", self.onAlarmRuleChange)
+        self.sio.on("cameraConfigChange", self.onCameraConfigChange)
 
         self.sio.on("connect", self.onConnect)
         self.sio.on("disconnect", self.onDisconnect)
         self.sio.on("connect_error", self.onConnectError)
+
         pass
 
     async def connect(self):
@@ -67,7 +76,6 @@ class WSClient:
                 "username": self.username,
                 "password": self.password,
                 "cameraID": self.cameraID,
-                "hlsUrl": self.hlsUrl,
             }
         )
         await self.sio.connect(
@@ -90,10 +98,9 @@ class WSClient:
             'predictResult': Any
         }
         """
-        if self.alarmRule is None:
-            print(f"Alarm rule not loaded")
+        if not self.ready or self.alarmRules is None:
             return None
-        for rule in self.alarmRule:
+        for rule in self.alarmRules:
             if (
                 rule["enabled"]
                 and rule["algorithmType"] == data["algorithmType"]
@@ -149,16 +156,27 @@ class WSClient:
         # 防止短时间内重复发送
         self.alarmThrottle[rule["id"]] = datetime.now()
 
-        print(f"I sent an alarm")
+        print(f"Alarm sent: {rule['name']}")
         pass
 
     async def disconnect(self):
         await self.sio.disconnect()
         pass
 
-    def onAlarmRuleChange(self, data):
-        self.alarmRule = data
-        print(f"Alarm rule updated")
+    async def onCameraConfigChange(self, data):
+        self.rtmpUrl = data["rtmpUrl"]
+        self.alarmRules = data["alarmRules"]
+        print(f"Camera config updated")
+
+        if self.ready is False:
+            self.ready = True
+            asyncio.get_event_loop().create_task(self.onReady(self))
+            print("ready")
+        pass
+
+    async def stayConnected(self):
+        await self.connect()
+        await self.sio.wait()
         pass
 
     def onConnect(self):

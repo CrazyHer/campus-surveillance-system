@@ -34,6 +34,8 @@ interface AddFormData {
   Longitude: number;
   cameraModel: string;
   alarmRuleIDs: number[];
+  hlsUrl: string;
+  rtmpUrl: string;
 }
 
 interface EditFormData {
@@ -43,6 +45,8 @@ interface EditFormData {
   Longitude: number;
   cameraModel: string;
   alarmRuleIDs: number[];
+  hlsUrl: string;
+  rtmpUrl: string;
 }
 
 const CamerasManage: FC = () => {
@@ -114,7 +118,7 @@ const CamerasManage: FC = () => {
   const handleMapCameraClick = (cameraID: number) => {
     if (selectedCameraIds[0] === cameraID) {
       const cameraInfo = cameraList.find((item) => item.cameraID === cameraID);
-      (cameraInfo != null) && handleConfigCamera(cameraInfo);
+      cameraInfo != null && handleConfigCamera(cameraInfo);
       return;
     }
     setSelectedCameraIds([cameraID]);
@@ -130,6 +134,8 @@ const CamerasManage: FC = () => {
         latlng: [formData.Lattitude, formData.Longitude],
         cameraModel: formData.cameraModel,
         alarmRuleIDs: formData.alarmRuleIDs,
+        hlsUrl: formData.hlsUrl,
+        rtmpUrl: formData.rtmpUrl,
       });
       message.success('配置成功');
       setEditModalOpen(false);
@@ -149,6 +155,8 @@ const CamerasManage: FC = () => {
         latlng: [formData.Lattitude, formData.Longitude],
         cameraModel: formData.cameraModel,
         alarmRuleIDs: formData.alarmRuleIDs,
+        hlsUrl: formData.hlsUrl,
+        rtmpUrl: formData.rtmpUrl,
       });
       message.success('添加成功');
       setAddModalOpen(false);
@@ -227,16 +235,25 @@ const CamerasManage: FC = () => {
         <Button.Group>
           <Button
             type="link"
-            onClick={() => { handleLocateCamera(record.cameraID); }}
+            onClick={() => {
+              handleLocateCamera(record.cameraID);
+            }}
           >
             定位
           </Button>
-          <Button type="link" onClick={() => { handleConfigCamera(record); }}>
+          <Button
+            type="link"
+            onClick={() => {
+              handleConfigCamera(record);
+            }}
+          >
             配置
           </Button>
           <Popconfirm
             title="确认删除该摄像头?"
-            onConfirm={async () => { await handleDeleteCamera(record.cameraID); }}
+            onConfirm={async () => {
+              await handleDeleteCamera(record.cameraID);
+            }}
           >
             <Button type="link">删除</Button>
           </Popconfirm>
@@ -277,6 +294,14 @@ const CamerasManage: FC = () => {
       </Form.Item>
 
       <Form.Item label="型号" name="cameraModel" rules={[{ required: true }]}>
+        <Input />
+      </Form.Item>
+
+      <Form.Item label="HLS地址" name="hlsUrl" rules={[{ required: true }]}>
+        <Input />
+      </Form.Item>
+
+      <Form.Item label="RTMP地址" name="rtmpUrl" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
 
@@ -326,14 +351,22 @@ const CamerasManage: FC = () => {
       <Modal
         title="新增摄像头"
         open={addModalOpen}
-        onCancel={() => { setAddModalOpen(false); }}
+        onCancel={() => {
+          setAddModalOpen(false);
+        }}
         centered
         footer={
           <>
             <Button type="primary" onClick={handleAddSubmit}>
               提交
             </Button>
-            <Button onClick={() => { setAddModalOpen(false); }}>返回</Button>
+            <Button
+              onClick={() => {
+                setAddModalOpen(false);
+              }}
+            >
+              返回
+            </Button>
           </>
         }
       >
@@ -343,7 +376,9 @@ const CamerasManage: FC = () => {
       <Modal
         title="配置摄像头"
         open={editModalOpen}
-        onCancel={() => { setEditModalOpen(false); }}
+        onCancel={() => {
+          setEditModalOpen(false);
+        }}
         centered
         footer={
           <>
@@ -364,7 +399,13 @@ const CamerasManage: FC = () => {
               </Button>
             </Popconfirm>
 
-            <Button onClick={() => { setEditModalOpen(false); }}>返回</Button>
+            <Button
+              onClick={() => {
+                setEditModalOpen(false);
+              }}
+            >
+              返回
+            </Button>
           </>
         }
       >

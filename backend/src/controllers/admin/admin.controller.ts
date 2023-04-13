@@ -66,14 +66,15 @@ export class AdminController {
   async getCameraList(): Promise<
     FetchTypes['GET /api/admin/getCameraList']['res']['data']
   > {
-    const list = await this.cameraService.getList(true);
+    const list = await this.cameraService.getList(true, true);
     return list.map((camera) => ({
       cameraID: camera.id,
       cameraName: camera.name,
-      cameraStatus: camera.status,
+      cameraStatus: this.cameraService.getCameraStatus(camera),
       latlng: [Number(camera.latitude), Number(camera.longitude)],
       cameraModel: camera.model,
       hlsUrl: camera.hlsUrl,
+      rtmpUrl: camera.rtmpUrl,
       alarmRules:
         camera.alarmRules?.map((rule) => ({
           alarmRuleID: rule.id,
@@ -91,6 +92,8 @@ export class AdminController {
       model: body.cameraModel,
       latitude: body.latlng[0],
       longitude: body.latlng[1],
+      hlsUrl: body.hlsUrl,
+      rtmpUrl: body.rtmpUrl,
       alarmRules:
         body.alarmRuleIDs?.map((id) => {
           const rule = new AlarmRule();
@@ -112,6 +115,8 @@ export class AdminController {
       model: body.cameraModel,
       latitude: body.latlng[0],
       longitude: body.latlng[1],
+      hlsUrl: body.hlsUrl,
+      rtmpUrl: body.rtmpUrl,
       alarmRules: body.alarmRuleIDs.map((id) => {
         const rule = new AlarmRule();
         rule.id = id;
@@ -119,7 +124,7 @@ export class AdminController {
       }),
     });
 
-    this.aiEndGateway.notifyAlarmRuleChange(body.cameraID);
+    this.aiEndGateway.notifyCameraConfigChange(body.cameraID);
     return {};
   }
 
@@ -172,7 +177,7 @@ export class AdminController {
       relatedCameras: body.relatedCameraIds.map((id) => {
         const camera = new Camera();
         camera.id = id;
-        this.aiEndGateway.notifyAlarmRuleChange(id);
+        this.aiEndGateway.notifyCameraConfigChange(id);
         return camera;
       }),
       triggerDayOfWeek: body.triggerCondition.time.dayOfWeek,
@@ -197,7 +202,7 @@ export class AdminController {
       relatedCameras: body.relatedCameraIds.map((id) => {
         const camera = new Camera();
         camera.id = id;
-        this.aiEndGateway.notifyAlarmRuleChange(id);
+        this.aiEndGateway.notifyCameraConfigChange(id);
         return camera;
       }),
       triggerDayOfWeek: body.triggerCondition.time.dayOfWeek,
@@ -218,7 +223,7 @@ export class AdminController {
     if (!rule) throw new NotFoundException('Alarm rule not found');
 
     rule?.relatedCameras?.forEach((camera) => {
-      this.aiEndGateway.notifyAlarmRuleChange(camera.id);
+      this.aiEndGateway.notifyCameraConfigChange(camera.id);
     });
     await this.alarmRuleService.deleteRule(body.alarmRuleID);
 

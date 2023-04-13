@@ -46,17 +46,17 @@ export class UserController {
       latlng: [number, number];
     }[];
   }> {
-    const cameraList = await this.cameraService.getList();
+    const cameraList = await this.cameraService.getList(false, true);
     let cameraOnline = 0,
       cameraAlarm = 0;
 
     const cameraListRes = cameraList.map((camera) => {
-      if (camera.status === 'normal') cameraOnline++;
-      if (camera.status === 'alarm') cameraAlarm++;
+      if (camera.online) cameraOnline++;
+      if (this.cameraService.getCameraStatus(camera) === 'alarm') cameraAlarm++;
       return {
         cameraName: camera.name,
         cameraID: camera.id,
-        cameraStatus: camera.status,
+        cameraStatus: this.cameraService.getCameraStatus(camera),
         latlng: [Number(camera.latitude), Number(camera.longitude)] as [
           number,
           number,
@@ -84,7 +84,7 @@ export class UserController {
     return {
       cameraName: camera.name,
       cameraID: camera.id,
-      cameraStatus: camera.status,
+      cameraStatus: this.cameraService.getCameraStatus(camera),
       hlsUrl: camera.hlsUrl,
       latlng: [Number(camera.latitude), Number(camera.longitude)] as [
         number,
@@ -151,10 +151,10 @@ export class UserController {
   async getMonitList(): Promise<
     FetchTypes['GET /api/user/getMonitList']['res']['data']
   > {
-    return (await this.cameraService.getList()).map((camera) => ({
+    return (await this.cameraService.getList(false, true)).map((camera) => ({
       cameraID: camera.id,
       cameraName: camera.name,
-      cameraStatus: camera.status,
+      cameraStatus: this.cameraService.getCameraStatus(camera),
       hlsUrl: camera.hlsUrl,
     }));
   }

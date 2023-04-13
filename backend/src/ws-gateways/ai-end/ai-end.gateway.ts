@@ -19,12 +19,16 @@ interface ClientInfo {
   username: string;
   password: string;
   cameraID: string;
-  hlsUrl: string;
 }
 
 interface AlarmData {
   picBase64: string;
   alarmRuleID: number;
+}
+
+interface CameraConfig {
+  rtmpUrl: string;
+  alarmRules: AlarmRule[];
 }
 
 @WebSocketGateway<Partial<ServerOptions>>({
@@ -40,9 +44,7 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private alarmEventService: AlarmEventService,
     private userService: UserService,
     private utilsService: UtilsService,
-  ) {
-    console.log('gateway init');
-  }
+  ) {}
 
   connecetedClients: Map<string, Socket> = new Map();
 
@@ -77,15 +79,21 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  async notifyAlarmRuleChange(cameraID: number, alarmRules?: AlarmRule[]) {
-    console.log('notifyAlarmRuleChange');
+  async notifyCameraConfigChange(
+    cameraID: number,
+    cameraConfig?: CameraConfig,
+  ) {
+    console.log('notifyCameraConfigChange');
     const client = this.connecetedClients.get(cameraID.toString());
-    client?.emit(
-      'alarmRuleChange',
-      alarmRules ??
-        (await this.cameraService.getById(cameraID, true))?.alarmRules ??
-        [],
-    );
+    if (!cameraConfig) {
+      const config = await this.cameraService.getById(cameraID, true);
+      if (!config) return;
+      cameraConfig = {
+        alarmRules: config?.alarmRules ?? [],
+        rtmpUrl: config.rtmpUrl,
+      };
+    }
+    client?.emit('cameraConfigChange', cameraConfig);
   }
 
   async disconnectClient(cameraID: number) {
@@ -117,7 +125,11 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       client.data = data;
 
-      const camera = await this.cameraService.getById(parseInt(data.cameraID));
+      const camera = await this.cameraService.getById(
+        parseInt(data.cameraID),
+        false,
+        true,
+      );
       if (!camera) {
         client.disconnect();
         return;
@@ -125,15 +137,14 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       await this.cameraService.updateCamera({
         id: parseInt(data.cameraID),
-        hlsUrl: data.hlsUrl,
-        status: camera.alarmEvents?.length ?? 0 > 0 ? 'alarm' : 'normal',
+        online: true,
       });
 
       this.connecetedClients.set(data.cameraID, client);
 
       console.log('client connected');
 
-      await this.notifyAlarmRuleChange(parseInt(data.cameraID));
+      await this.notifyCameraConfigChange(parseInt(data.cameraID));
     } catch {
       client.disconnect();
     }
@@ -146,8 +157,7 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const data = client.data as ClientInfo;
     await this.cameraService.updateCamera({
       id: parseInt(data.cameraID),
-      hlsUrl: '',
-      status: 'offline',
+      online: false,
     });
 
     console.log('client disconnected');

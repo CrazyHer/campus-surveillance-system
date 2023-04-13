@@ -4,98 +4,61 @@ import cv2
 import asyncio
 
 
-# Windows推流摄像头到rtmp://localhost:1515/hls/3
+# Windows推流本机摄像头到rtmp://localhost:1515/hls/3
 # ffmpeg -f dshow -i video="USB2.0 HD UVC WebCam" -f dshow -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://localhost:1515/hls/3
-def test_detectVideo():
-    def onFrame(frameResult):
-        cv2.imshow("image", frameResult.plot())
-        cv2.waitKey(25)
-        print(frameResult.clsCount)
+
+
+async def detectVideoAndSendAlarmForCameras(
+    serverUrl="", adminUsername="", password="", cameraIDs=[]
+):
+    model = YOLOModel()
+
+    async def beginWork(ws: WSClient):
+        results = model.detectVideo(ws.rtmpUrl, classList=[0, 2])  # 0:person, 2:car
+        for frameResult in results:
+            cv2.imshow("image", frameResult.plot())
+            cv2.waitKey(1)
+            clsCount = model.getResultClsCount(frameResult)
+            await ws.trySendAlarm(
+                {
+                    "algorithmType": "body",
+                    "count": clsCount.get("person", 0),
+                    "predictResult": frameResult,
+                }
+            )
+            await ws.trySendAlarm(
+                {
+                    "algorithmType": "vehicle",
+                    "count": clsCount.get("car", 0),
+                    "predictResult": frameResult,
+                }
+            )
+
+            await asyncio.sleep(0.5)
         pass
 
-    model = YOLOModel()
-    model.detectVideo("rtmp://localhost:1515/hls/3", onFrame=onFrame)
-    pass
-
-
-def test_detectImage():
-    model = YOLOModel()
-    result = model.detectImage("./test-images/2.jpeg")
-    cv2.imshow("image", result.plot())
-    print(result.clsCount)
-    cv2.waitKey(0)
-    pass
-
-
-async def test_wsClient():
-    ws = WSClient(
-        "http://localhost:3000",
-        "admin123",
-        "admin123",
-        "3",
-        "http://localhost/hls/3.m3u8",
-    )
-    await ws.connect()
-    await ws.sio.wait()
-
-
-async def test_sendAlarm():
-    ws = WSClient(
-        "http://localhost:3000",
-        "admin123",
-        "admin123",
-        "3",
-        "http://localhost/hls/3.m3u8",
-    )
-    await ws.connect()
-
-    model = YOLOModel()
-    result = model.detectImage("./test-images/2.jpeg")
-    print(result.clsCount)
-    await ws.trySendAlarm(
-        {
-            "algorithmType": "body",
-            "count": result.clsCount["person"],
-            "predictResult": result,
-        }
-    )
-    await ws.sio.wait()
-    pass
-
-
-async def test_detectVideoAndSendAlarm():
-    model = YOLOModel()
-    ws = WSClient(
-        "http://localhost:3000",
-        "admin123",
-        "admin123",
-        "3",
-        "http://localhost/hls/3.m3u8",
-    )
-    await ws.connect()
-    await asyncio.sleep(1)
-
-    results = model.detectVideo("rtmp://localhost:1515/hls/3")
-    for frameResult in results:
-        cv2.imshow("image", frameResult.plot())
-        cv2.waitKey(1)
-        await ws.trySendAlarm(
-            {
-                "algorithmType": "body",
-                "count": model.getClsCount(frameResult)["person"],
-                "predictResult": frameResult,
-            }
+    tasks = []
+    for cameraID in cameraIDs:
+        client = WSClient(
+            serverUrl,
+            adminUsername,
+            password,
+            str(cameraID),
+            beginWork,
         )
-        await asyncio.sleep(1)
-        pass
-
+        tasks.append(asyncio.create_task(client.stayConnected()))
+    print("wait for all tasks")
+    await asyncio.gather(*tasks)
     pass
 
 
 async def main():
-    # await test_sendAlarm()
-    # await test_wsClient()
-    await test_detectVideoAndSendAlarm()
+    await detectVideoAndSendAlarmForCameras(
+        serverUrl="http://localhost:3000",
+        adminUsername="admin123",
+        password="admin123",
+        cameraIDs=["3"],
+    )
     pass
 
 

@@ -32,6 +32,16 @@ export class CameraService {
     });
   }
 
+  getCameraStatus(camera: Camera): 'normal' | 'offline' | 'alarm' {
+    if (camera.online === false) return 'offline';
+    if (
+      camera.alarmEvents?.filter((event) => event.resolved === false)?.length ??
+      0 > 0
+    )
+      return 'alarm';
+    return 'normal';
+  }
+
   async addCamera(camera: Partial<Camera>) {
     return await this.cameraRepo.save(camera);
   }
