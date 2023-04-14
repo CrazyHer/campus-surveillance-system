@@ -126,7 +126,7 @@ const CameraInfo: FC<{
         setVideoLoading(false);
       }
     }
-  }, [data]);
+  }, [data?.hlsUrl, data?.cameraStatus]);
 
   const handleError = () => {
     setVideoLoading(false);
@@ -182,7 +182,7 @@ const CameraInfo: FC<{
       >
         <Descriptions.Item label="异常报警事件">
           <Table
-            pagination={{ pageSize: 5 }}
+            pagination={{ pageSizeOptions: [5, 10] }}
             size="small"
             columns={tableColumns}
             dataSource={data?.alarmEvents}

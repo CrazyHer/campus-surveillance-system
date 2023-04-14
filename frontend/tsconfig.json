@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "noEmit": true,
+    "skipLibCheck": true
   },
   "extends": "./src/.umi/tsconfig.json"
 }

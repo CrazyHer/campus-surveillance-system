@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Post,
   PreconditionFailedException,
+  Query,
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
@@ -45,17 +46,17 @@ export class UserController {
       latlng: [number, number];
     }[];
   }> {
-    const cameraList = await this.cameraService.getList();
+    const cameraList = await this.cameraService.getList(false, true);
     let cameraOnline = 0,
       cameraAlarm = 0;
 
     const cameraListRes = cameraList.map((camera) => {
-      if (camera.status === 'normal') cameraOnline++;
-      if (camera.status === 'alarm') cameraAlarm++;
+      if (camera.online) cameraOnline++;
+      if (this.cameraService.getCameraStatus(camera) === 'alarm') cameraAlarm++;
       return {
         cameraName: camera.name,
         cameraID: camera.id,
-        cameraStatus: camera.status,
+        cameraStatus: this.cameraService.getCameraStatus(camera),
         latlng: [Number(camera.latitude), Number(camera.longitude)] as [
           number,
           number,
@@ -74,16 +75,16 @@ export class UserController {
 
   @Get('/api/user/getCameraInfo')
   async getCameraInfo(
-    @Body('cameraID')
+    @Query('cameraID')
     cameraID: FetchTypes['GET /api/user/getCameraInfo']['req']['cameraID'],
   ): Promise<FetchTypes['GET /api/user/getCameraInfo']['res']['data']> {
-    const camera = await this.cameraService.getById(cameraID, true);
+    const camera = await this.cameraService.getById(cameraID, true, true);
     if (!camera) throw new NotFoundException('Camera not found');
 
     return {
       cameraName: camera.name,
       cameraID: camera.id,
-      cameraStatus: camera.status,
+      cameraStatus: this.cameraService.getCameraStatus(camera),
       hlsUrl: camera.hlsUrl,
       latlng: [Number(camera.latitude), Number(camera.longitude)] as [
         number,
@@ -98,17 +99,17 @@ export class UserController {
       alarmEvents:
         camera.alarmEvents?.map((event) => ({
           eventID: event.id,
-          alarmTime: dayjs(event.time).format('yyyy-MM-dd HH:mm:ss'),
+          alarmTime: dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss'),
           alarmRule: {
-            alarmRuleID: event.alarmRule.id,
-            alarmRuleName: event.alarmRule.name,
+            alarmRuleID: event?.alarmRule?.id ?? 0,
+            alarmRuleName: event?.alarmRule?.name ?? '',
           },
           resolved: event.resolved,
         })) ?? [],
     };
   }
 
-  @Get('/api/user/resolveAlarm')
+  @Post('/api/user/resolveAlarm')
   async resolveAlarm(
     @Body('eventID')
     eventID: FetchTypes['POST /api/user/resolveAlarm']['req']['eventID'],
@@ -119,57 +120,41 @@ export class UserController {
 
   @Get('/api/user/getAlarmEvents')
   async getAlarmEvents(
-    @Body('cameraID')
+    @Query('cameraID')
     cameraID: FetchTypes['GET /api/user/getAlarmEvents']['req']['cameraID'],
   ): Promise<FetchTypes['GET /api/user/getAlarmEvents']['res']['data']> {
-    if (cameraID) {
-      const camera = await this.cameraService.getById(cameraID);
-      if (!camera) throw new NotFoundException('Camera not found');
-      return (
-        camera.alarmEvents?.map((event) => ({
-          eventID: event.id,
-          alarmTime: dayjs(event.time).format('yyyy-MM-dd HH:mm:ss'),
-          alarmRule: {
-            alarmRuleID: event.alarmRule.id,
-            alarmRuleName: event.alarmRule.name,
-          },
-          resolved: event.resolved,
-          cameraID: camera.id,
-          cameraName: camera.name,
-          cameraLatlng: [Number(camera.latitude), Number(camera.longitude)],
-          cameraModel: camera.model,
-          alarmPicUrl: event.picUrl,
-        })) ?? []
-      );
-    } else {
-      return (await this.alarmEventService.getList()).map((event) => ({
+    return (
+      (cameraID
+        ? await this.alarmEventService.getByCameraId(cameraID, true, true)
+        : await this.alarmEventService.getList(true, true)
+      )?.map((event) => ({
         eventID: event.id,
-        alarmTime: dayjs(event.time).format('yyyy-MM-dd HH:mm:ss'),
+        alarmTime: dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss'),
         alarmRule: {
-          alarmRuleID: event.alarmRule.id,
-          alarmRuleName: event.alarmRule.name,
+          alarmRuleID: event?.alarmRule?.id ?? 0,
+          alarmRuleName: event?.alarmRule?.name ?? '',
         },
         resolved: event.resolved,
-        cameraID: event.sourceCamera.id,
-        cameraName: event.sourceCamera.name,
+        cameraID: event?.sourceCamera?.id ?? 0,
+        cameraName: event?.sourceCamera?.name ?? '',
         cameraLatlng: [
-          Number(event.sourceCamera.latitude),
-          Number(event.sourceCamera.longitude),
+          Number(event?.sourceCamera?.latitude),
+          Number(event?.sourceCamera?.longitude),
         ],
-        cameraModel: event.sourceCamera.model,
-        alarmPicUrl: event.picUrl,
-      }));
-    }
+        cameraModel: event?.sourceCamera?.model ?? '',
+        alarmPicUrl: this.utilsService.filePathToURL(event.picFilePath),
+      })) ?? []
+    );
   }
 
   @Get('/api/user/getMonitList')
   async getMonitList(): Promise<
     FetchTypes['GET /api/user/getMonitList']['res']['data']
   > {
-    return (await this.cameraService.getList()).map((camera) => ({
+    return (await this.cameraService.getList(false, true)).map((camera) => ({
       cameraID: camera.id,
       cameraName: camera.name,
-      cameraStatus: camera.status,
+      cameraStatus: this.cameraService.getCameraStatus(camera),
       hlsUrl: camera.hlsUrl,
     }));
   }

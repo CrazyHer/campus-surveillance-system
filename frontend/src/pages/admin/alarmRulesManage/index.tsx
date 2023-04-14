@@ -285,8 +285,11 @@ const AlarmRulesManage: FC = () => {
       >
         <Select
           options={[
-            { label: '人体检测', value: 'body' },
-            { label: '车辆检测', value: 'vehicle' },
+            { label: '人体检测', value: constants.alarmRuleAlgorithmType.BODY },
+            {
+              label: '车辆检测',
+              value: constants.alarmRuleAlgorithmType.VEHICLE,
+            },
           ]}
         />
       </Form.Item>

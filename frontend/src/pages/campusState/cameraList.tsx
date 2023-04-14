@@ -9,9 +9,11 @@ const CameraList: FC<{
   data?: ServiceTypes['GET /api/user/getCampusState']['res']['data']['cameraList'];
   onCameraCheck: (cameraID: number) => any;
 }> = (props) => {
-  const columns: Array<ColumnType<
-    ServiceTypes['GET /api/user/getCampusState']['res']['data']['cameraList'][0]
-  >> = [
+  const columns: Array<
+    ColumnType<
+      ServiceTypes['GET /api/user/getCampusState']['res']['data']['cameraList'][0]
+    >
+  > = [
     { title: '摄像头名称', dataIndex: 'cameraName' },
     {
       title: '状态',
@@ -37,7 +39,12 @@ const CameraList: FC<{
     },
   ];
   return (
-    <Card title="摄像头列表" bordered={false} size="small">
+    <Card
+      title="摄像头列表"
+      bordered={false}
+      size="small"
+      className={Styles.cameraListCard}
+    >
       <Table
         className={Styles.table}
         size="small"

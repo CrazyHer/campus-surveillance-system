@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ControllersModule } from './controllers/controllers.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { WsGatewaysModule } from './ws-gateways/ws-gateways.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
         password: configService.get('MYSQL_PASSWORD'),
         synchronize: true,
         autoLoadEntities: true,
+        timezone: 'Z',
       }),
     }),
     CacheModule.register({ isGlobal: true }),
@@ -31,16 +33,16 @@ import { ServeStaticModule } from '@nestjs/serve-static';
         },
       ],
     }),
-
     JwtModule.registerAsync({
+      global: true,
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
         signOptions: { expiresIn: configService.get('JWT_EXPIRES_IN') },
       }),
-      inject: [ConfigService],
-      global: true,
     }),
     ControllersModule,
+    WsGatewaysModule,
   ],
 })
 export class AppModule {}

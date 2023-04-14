@@ -5,7 +5,7 @@
     "build": "umi build",
     "dev": "umi dev",
     "postinstall": "umi setup",
-    "lint": "eslint .",
+    "lint": "tsc && eslint .",
     "setup": "umi setup",
     "start": "npm run dev"
   },

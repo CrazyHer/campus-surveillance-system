@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Post,
   SetMetadata,
   UseGuards,
@@ -16,6 +17,7 @@ import { MapConfigService } from 'src/services/map-config/map-config.service';
 import { UserService } from 'src/services/user/user.service';
 import { UtilsService } from 'src/services/utils/utils.service';
 import { FetchTypes } from 'src/types/fetchTypes';
+import { AiEndGateway } from 'src/ws-gateways/ai-end/ai-end.gateway';
 
 @Controller()
 @SetMetadata('role', 'admin')
@@ -27,6 +29,7 @@ export class AdminController {
     private cameraService: CameraService,
     private alarmRuleService: AlarmRuleService,
     private userService: UserService,
+    private aiEndGateway: AiEndGateway,
   ) {}
 
   @Post('/api/admin/updateMapConfig')
@@ -63,14 +66,15 @@ export class AdminController {
   async getCameraList(): Promise<
     FetchTypes['GET /api/admin/getCameraList']['res']['data']
   > {
-    const list = await this.cameraService.getList(true);
+    const list = await this.cameraService.getList(true, true);
     return list.map((camera) => ({
       cameraID: camera.id,
       cameraName: camera.name,
-      cameraStatus: camera.status,
+      cameraStatus: this.cameraService.getCameraStatus(camera),
       latlng: [Number(camera.latitude), Number(camera.longitude)],
       cameraModel: camera.model,
       hlsUrl: camera.hlsUrl,
+      rtmpUrl: camera.rtmpUrl,
       alarmRules:
         camera.alarmRules?.map((rule) => ({
           alarmRuleID: rule.id,
@@ -88,6 +92,8 @@ export class AdminController {
       model: body.cameraModel,
       latitude: body.latlng[0],
       longitude: body.latlng[1],
+      hlsUrl: body.hlsUrl,
+      rtmpUrl: body.rtmpUrl,
       alarmRules:
         body.alarmRuleIDs?.map((id) => {
           const rule = new AlarmRule();
@@ -109,6 +115,8 @@ export class AdminController {
       model: body.cameraModel,
       latitude: body.latlng[0],
       longitude: body.latlng[1],
+      hlsUrl: body.hlsUrl,
+      rtmpUrl: body.rtmpUrl,
       alarmRules: body.alarmRuleIDs.map((id) => {
         const rule = new AlarmRule();
         rule.id = id;
@@ -116,6 +124,7 @@ export class AdminController {
       }),
     });
 
+    this.aiEndGateway.notifyCameraConfigChange(body.cameraID);
     return {};
   }
 
@@ -124,7 +133,7 @@ export class AdminController {
     @Body() body: FetchTypes['POST /api/admin/deleteCamera']['req'],
   ): Promise<FetchTypes['POST /api/admin/deleteCamera']['res']['data']> {
     await this.cameraService.deleteCamera(body.cameraID);
-
+    await this.aiEndGateway.disconnectClient(body.cameraID);
     return {};
   }
 
@@ -168,6 +177,7 @@ export class AdminController {
       relatedCameras: body.relatedCameraIds.map((id) => {
         const camera = new Camera();
         camera.id = id;
+        this.aiEndGateway.notifyCameraConfigChange(id);
         return camera;
       }),
       triggerDayOfWeek: body.triggerCondition.time.dayOfWeek,
@@ -192,6 +202,7 @@ export class AdminController {
       relatedCameras: body.relatedCameraIds.map((id) => {
         const camera = new Camera();
         camera.id = id;
+        this.aiEndGateway.notifyCameraConfigChange(id);
         return camera;
       }),
       triggerDayOfWeek: body.triggerCondition.time.dayOfWeek,
@@ -208,6 +219,12 @@ export class AdminController {
   async deleteAlarmRule(
     @Body() body: FetchTypes['POST /api/admin/deleteAlarmRule']['req'],
   ): Promise<FetchTypes['POST /api/admin/deleteAlarmRule']['res']['data']> {
+    const rule = await this.alarmRuleService.getById(body.alarmRuleID, true);
+    if (!rule) throw new NotFoundException('Alarm rule not found');
+
+    rule?.relatedCameras?.forEach((camera) => {
+      this.aiEndGateway.notifyCameraConfigChange(camera.id);
+    });
     await this.alarmRuleService.deleteRule(body.alarmRuleID);
 
     return {};

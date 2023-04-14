@@ -9,9 +9,29 @@ export class AlarmRuleService {
     @InjectRepository(AlarmRule) private alarmRuleRepo: Repository<AlarmRule>,
   ) {}
 
-  async getList(withAlarmRules = false): Promise<AlarmRule[]> {
+  async getList(
+    withRelatedCameras = false,
+    withAlarmEvents = false,
+  ): Promise<AlarmRule[]> {
     return await this.alarmRuleRepo.find({
-      relations: { relatedCameras: withAlarmRules },
+      relations: {
+        relatedCameras: withRelatedCameras,
+        alarmEvents: withAlarmEvents,
+      },
+    });
+  }
+
+  async getById(
+    ruleID: number,
+    withRelatedCameras = false,
+    withAlarmEvents = false,
+  ): Promise<AlarmRule | null> {
+    return await this.alarmRuleRepo.findOne({
+      where: { id: ruleID },
+      relations: {
+        relatedCameras: withRelatedCameras,
+        alarmEvents: withAlarmEvents,
+      },
     });
   }
 
