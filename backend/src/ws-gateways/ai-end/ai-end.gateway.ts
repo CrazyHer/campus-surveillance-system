@@ -83,7 +83,6 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
     cameraID: number,
     cameraConfig?: CameraConfig,
   ) {
-    console.log('notifyCameraConfigChange');
     const client = this.connecetedClients.get(cameraID.toString());
     if (!cameraConfig) {
       const config = await this.cameraService.getById(cameraID, true);
@@ -94,6 +93,8 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
       };
     }
     client?.emit('cameraConfigChange', cameraConfig);
+
+    console.log(`notify ${cameraID} CameraConfigChange`);
   }
 
   async disconnectClient(cameraID: number) {
@@ -142,7 +143,7 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       this.connecetedClients.set(data.cameraID, client);
 
-      console.log('client connected');
+      console.log(`client ${data.cameraID} connected`);
 
       await this.notifyCameraConfigChange(parseInt(data.cameraID));
     } catch {
@@ -160,6 +161,6 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
       online: false,
     });
 
-    console.log('client disconnected');
+    console.log(`client ${data.cameraID} disconnected`);
   }
 }

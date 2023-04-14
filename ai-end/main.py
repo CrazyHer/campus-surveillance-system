@@ -5,7 +5,8 @@ import asyncio
 
 
 # Windows推流本机摄像头到rtmp://localhost:1515/hls/3
-# ffmpeg -f dshow -i video="USB2.0 HD UVC WebCam" -f dshow -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://localhost:1515/hls/3
+# ffmpeg -list_devices true -f dshow -i dummy
+# ffmpeg -f dshow -i video="USB2.0 HD UVC WebCam" -f dshow -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://192.169.3.3:1515/hls/3
 
 
 async def detectVideoAndSendAlarmForCameras(
@@ -14,7 +15,10 @@ async def detectVideoAndSendAlarmForCameras(
     model = YOLOModel()
 
     async def beginWork(ws: WSClient):
+        print(f"begin to detect video for camera {ws.cameraID}, rtmpUrl: {ws.rtmpUrl}")
+        print(f"if wait too long, please check if ffmpeg is running")
         results = model.detectVideo(ws.rtmpUrl, classList=[0, 2])  # 0:person, 2:car
+
         for frameResult in results:
             cv2.imshow("image", frameResult.plot())
             cv2.waitKey(1)
@@ -47,7 +51,6 @@ async def detectVideoAndSendAlarmForCameras(
             beginWork,
         )
         tasks.append(asyncio.create_task(client.stayConnected()))
-    print("wait for all tasks")
     await asyncio.gather(*tasks)
     pass
 
@@ -57,7 +60,7 @@ async def main():
         serverUrl="http://localhost:3000",
         adminUsername="admin123",
         password="admin123",
-        cameraIDs=["3"],
+        cameraIDs=[3],
     )
     pass
 

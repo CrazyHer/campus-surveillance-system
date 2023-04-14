@@ -87,7 +87,7 @@ class WSClient:
     async def sendMessage(self, msg):
         await self.connect()
         await self.sio.emit("message", msg)
-        print("I sent a message!")
+        print("message sent")
         pass
 
     def matchAlarmRule(self, data):
@@ -156,7 +156,7 @@ class WSClient:
         # 防止短时间内重复发送
         self.alarmThrottle[rule["id"]] = datetime.now()
 
-        print(f"Alarm sent: {rule['name']}")
+        print(f"camera {self.cameraID} alarm sent: {rule['name']}")
         pass
 
     async def disconnect(self):
@@ -166,12 +166,11 @@ class WSClient:
     async def onCameraConfigChange(self, data):
         self.rtmpUrl = data["rtmpUrl"]
         self.alarmRules = data["alarmRules"]
-        print(f"Camera config updated")
+        print(f"Camera {self.cameraID} config updated")
 
         if self.ready is False:
             self.ready = True
             asyncio.get_event_loop().create_task(self.onReady(self))
-            print("ready")
         pass
 
     async def stayConnected(self):
@@ -180,11 +179,11 @@ class WSClient:
         pass
 
     def onConnect(self):
-        print("connection established")
+        print(f"connection for camera {self.cameraID} established")
         pass
 
     def onDisconnect(self):
-        print("disconnected from server")
+        print(f"camera {self.cameraID} disconnected from server")
         pass
 
     def onConnectError(self, err):
