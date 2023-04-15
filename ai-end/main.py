@@ -14,6 +14,7 @@ async def beginWork(ws: WSClient):
     print(f"begin to detect video for camera {ws.cameraID}, rtmpUrl: {ws.rtmpUrl}")
     print(f"if wait too long, please check if ffmpeg is running")
     results = model.detectVideo(ws.rtmpUrl, classList=[0, 2])  # 0:person, 2:car
+
     for frameResult in results:
         cv2.imshow(f"camera {ws.cameraID}", frameResult.plot())
         cv2.waitKey(1)
