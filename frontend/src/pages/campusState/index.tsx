@@ -50,6 +50,13 @@ const CampusState: FC = () => {
 
   useEffect(() => {
     fetchCampusState();
+
+    const timer = setInterval(() => {
+      fetchCampusState();
+    }, 10000);
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
 
   return (

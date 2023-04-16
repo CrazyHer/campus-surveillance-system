@@ -16,7 +16,7 @@ class WSClient:
 
     connected = False
     ready = False
-    onReady = lambda: None
+    def onReady(): return None
 
     username = None
     password = None
@@ -66,6 +66,7 @@ class WSClient:
         self.sio.on("disconnect", self.onDisconnect)
         self.sio.on("connect_error", self.onConnectError)
 
+        print(f"ws client for camera {cameraID} created")
         pass
 
     async def connect(self):
