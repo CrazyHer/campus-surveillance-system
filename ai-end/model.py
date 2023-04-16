@@ -4,9 +4,11 @@ from ultralytics import YOLO
 class YOLOModel:
     __model = None
     conf = 0.25
+    device = "cpu"
 
-    def __init__(self, conf=0.25):
+    def __init__(self, conf=0.25, device="cpu"):
         self.conf = conf
+        self.device = device
         self.__model = YOLO(model="./yolov8n.pt", task="detect")
 
     def detectImage(self, image, classList=[0, 2]):
@@ -28,6 +30,7 @@ class YOLOModel:
             line_thickness=1,
             conf=self.conf,
             classes=classList,
+            device=self.device,
         )
         return result
 

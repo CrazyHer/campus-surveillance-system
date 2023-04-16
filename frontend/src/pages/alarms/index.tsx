@@ -71,6 +71,13 @@ const Alarms: FC = () => {
   };
   useEffect(() => {
     fetchData();
+
+    const timer = setInterval(() => {
+      fetchData();
+    }, 10000);
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
 
   const [modalVisible, setModalVisible] = useState(false);

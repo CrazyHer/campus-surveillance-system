@@ -16,8 +16,8 @@ async def beginWork(ws: WSClient):
     results = model.detectVideo(ws.rtmpUrl, classList=[0, 2])  # 0:person, 2:car
 
     for frameResult in results:
-        cv2.imshow(f"camera {ws.cameraID}", frameResult.plot())
-        cv2.waitKey(1)
+        # cv2.imshow(f"camera {ws.cameraID}", frameResult.plot())
+        # cv2.waitKey(1)
         clsCount = model.getResultClsCount(frameResult)
         await ws.trySendAlarm(
             {
@@ -33,7 +33,7 @@ async def beginWork(ws: WSClient):
                 "predictResult": frameResult,
             }
         )
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(1)
     pass
 
 
@@ -70,7 +70,7 @@ def main(
 if __name__ == "__main__":
     multiprocessing.freeze_support()
 
-    serverUrl = "http://localhost:3000"
+    serverUrl = "ws://localhost:3000"
     adminUsername = "admin123"
     password = "admin123"
     cameraIDs = [3]

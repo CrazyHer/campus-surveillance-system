@@ -1,10 +1,8 @@
-import { FetchTypes } from 'src/types/fetchTypes';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
