@@ -1,8 +1,8 @@
 from model import YOLOModel
 from wsClient import WSClient
-import cv2
 import asyncio
 import multiprocessing
+import os
 
 # Windows推流本机摄像头到rtmp://localhost:1515/hls/3
 # ffmpeg -list_devices true -f dshow -i dummy
@@ -11,11 +11,9 @@ import multiprocessing
 
 async def beginWork(ws: WSClient):
     model = YOLOModel()
-    print(
-        f"begin to detect video for camera {ws.cameraID}, rtmpUrl: {ws.rtmpUrl}")
+    print(f"begin to detect video for camera {ws.cameraID}, rtmpUrl: {ws.rtmpUrl}")
     print(f"if wait too long, please check if ffmpeg is running")
-    results = model.detectVideo(ws.rtmpUrl, classList=[
-                                0, 2])  # 0:person, 2:car
+    results = model.detectVideo(ws.rtmpUrl, classList=[0, 2])  # 0:person, 2:car
 
     for frameResult in results:
         # cv2.imshow(f"camera {ws.cameraID}", frameResult.plot())
@@ -72,10 +70,10 @@ def main(
 if __name__ == "__main__":
     multiprocessing.freeze_support()
 
-    serverUrl = "ws://localhost:3000"
-    adminUsername = "admin123"
-    password = "admin123"
-    cameraIDs = [3]
+    serverUrl = os.getenv("SERVER_URL", "ws://localhost:3000")
+    adminUsername = os.getenv("ADMIN_USERNAME", "admin123")
+    password = os.getenv("ADMIN_PASSWORD", "admin123")
+    cameraIDs = os.getenv("CAMERA_IDS", "3").split(",")
 
     processes = []
     # start a process for each camera
