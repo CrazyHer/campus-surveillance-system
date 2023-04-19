@@ -1,0 +1,37 @@
+name: Lint Test
+
+on: [pull_request]
+
+env:
+  NODE_VERSION: '18.x'
+
+jobs:
+  Lint-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Lint
+        run: |
+          npm i -g pnpm
+          cd frontend
+          pnpm install
+          pnpm run lint
+
+  Lint-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Lint
+        run: |
+          npm i -g pnpm
+          cd backend
+          pnpm install
+          pnpm run lint
