@@ -1,6 +1,6 @@
 name: Lint Test
 
-on: [push, pull_request]
+on: [pull_request]
 
 env:
   NODE_VERSION: '18.x'
