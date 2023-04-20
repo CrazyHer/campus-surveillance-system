@@ -121,7 +121,7 @@ const CameraInfo: FC<{
       ) {
         videoRef.current.src = data.hlsUrl;
       } else if (HLS.isSupported()) {
-        const hlsPlayer = new HLS({ lowLatencyMode: true });
+        const hlsPlayer = new HLS(constants.HLS_LOWLATENCY_OPTION);
         hlsPlayer.loadSource(data.hlsUrl);
         hlsPlayer.attachMedia(videoRef.current);
         return () => {

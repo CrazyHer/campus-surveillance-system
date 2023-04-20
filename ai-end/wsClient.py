@@ -12,17 +12,20 @@ from datetime import datetime, timedelta
 class WSClient:
     __SHA256KEY = "campus-surveillance-system".encode("utf-8")
     sio = socketio.AsyncClient()
-    serverUrl = None
+    wsServerUrl = None
+    rtmpServerUrl = None
 
     connected = False
     ready = False
-    def onReady(): return None
+
+    def onReady():
+        return None
 
     username = None
     password = None
     cameraID = None
 
-    rtmpUrl = None
+    rtspUrl = None
     alarmRules = None
     """
     @type alarmRule: [{
@@ -48,9 +51,16 @@ class WSClient:
     throttleTime = 60  # seconds
 
     def __init__(
-        self, serverUrl, username, password, cameraID, onReady=lambda: Any
+        self,
+        wsServerUrl,
+        rtmpServerUrl,
+        username,
+        password,
+        cameraID,
+        onReady=lambda: Any,
     ) -> None:
-        self.serverUrl = serverUrl
+        self.wsServerUrl = wsServerUrl
+        self.rtmpServerUrl = rtmpServerUrl
         self.username = username
         self.password = base64.b64encode(
             hmac.new(
@@ -80,7 +90,7 @@ class WSClient:
             }
         )
         await self.sio.connect(
-            self.serverUrl, socketio_path="/ws/ai/", headers={"data": data}
+            self.wsServerUrl, socketio_path="/ws/ai/", headers={"data": data}
         )
         self.connected = True
         pass
@@ -165,7 +175,7 @@ class WSClient:
         pass
 
     async def onCameraConfigChange(self, data):
-        self.rtmpUrl = data["rtmpUrl"]
+        self.rtspUrl = data["rtspUrl"]
         self.alarmRules = data["alarmRules"]
         print(f"Camera {self.cameraID} config updated")
 

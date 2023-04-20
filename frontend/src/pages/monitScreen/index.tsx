@@ -49,7 +49,7 @@ const MonitScreen: FC = () => {
         if (videoRef.canPlayType('application/vnd.apple.mpegurl').length > 0) {
           videoRef.src = item.hlsUrl;
         } else if (HLS.isSupported()) {
-          const hlsPlayer = new HLS({ lowLatencyMode: true });
+          const hlsPlayer = new HLS(constants.HLS_LOWLATENCY_OPTION);
           hlsPlayer.loadSource(item.hlsUrl);
           hlsPlayer.attachMedia(videoRef);
           disposeFuncs.push(() => {

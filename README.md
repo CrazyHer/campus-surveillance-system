@@ -1,7 +1,18 @@
 # 基于服务器本地地图的园区视频监控 web 系统
 
-[![Docker Image Version (latest by date)](https://img.shields.io/docker/v/crazyher/campus-surveillance-system?label=Docker%20Image%3A%20campus-surveillance-system)](https://hub.docker.com/r/crazyher/campus-surveillance-system)
-[![Docker Image Version (latest by date)](https://img.shields.io/docker/v/crazyher/campus-surveillance-ai-end?label=Docker%20Image%3A%20campus-surveillance-ai-end)](https://hub.docker.com/r/crazyher/campus-surveillance-ai-end)
+<p align="center">
+  <a href="https://hub.docker.com/r/crazyher/campus-surveillance-system">
+    <img src="https://img.shields.io/docker/v/crazyher/campus-surveillance-system?label=campus-surveillance-system" alt="campus-surveillance-system"/>
+  </a>
+
+  <a href="https://hub.docker.com/r/crazyher/campus-surveillance-system">
+    <img src="https://img.shields.io/docker/v/crazyher/campus-surveillance-ai-end?label=campus-surveillance-ai-end" alt="campus-surveillance-ai-end"/>
+  </a>
+
+  <a href="https://hub.docker.com/r/crazyher/campus-surveillance-system">
+    <img src="https://img.shields.io/github/actions/workflow/status/CrazyHer/campus-surveillance-system/lint.yaml?label=Lint%20Test" alt="Lint Test"/>
+  </a>
+</p>
 
 ## 题目介绍
 
@@ -19,34 +30,35 @@
 
 ### 架构
 
-系统架构主要由 web 前后端、监控算法端以及 RTMP 服务器几个部分组成，如下图：  
+系统架构主要由 web 前后端、RTMP 服务器、监控算法端以及摄像头四部分组成，如下图：  
 ![系统架构图](docs/system-framework.png)
 
-其中 RTMP 服务器只需要提供 RTMP 和 HLS 流的支持即可，在本系统中我们不关心其具体实现。可以使用 [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module) 在 nginx 上简单配置即可支持。
-
-若要自搭建地图切片服务器，可参考[openstreetmap-tile-server](https://github.com/Overv/openstreetmap-tile-server)，使用 Docker 搭建服务器提供本地 OpenStreetMap 地图切片
+PS：若要本地搭建地图切片服务器，可参考[openstreetmap-tile-server](https://github.com/Overv/openstreetmap-tile-server)，使用 Docker 搭建服务器提供本地 OpenStreetMap 地图切片
 
 ### 部署和使用
 
-前后端统一打包构建为 Docker Image：[crazyher/campus-surveillance-system](https://hub.docker.com/repository/docker/crazyher/campus-surveillance-system)
+前后端和 RTMP 服务器统一打包构建为 Docker Image：[crazyher/campus-surveillance-system](https://hub.docker.com/repository/docker/crazyher/campus-surveillance-system)
 
 ```shell
-docker run -p 8080:80 -e MYSQL_HOST=localhost \
-                      -e MYSQL_PORT=3306 \
-                      -e MYSQL_DATABASE=campus-surveillance-system \
-                      -e MYSQL_USER=root \
-                      -e MYSQL_PASSWORD=root \
-                      -e JWT_SECRET=secret \
-                      -e JWT_EXPIRES_IN=30d \
-                      -e URL_TO_PUBLIC_DIR=http://localhost:3000/public \
-                      -- name campus-surveillance-system \
-                      crazyher/campus-surveillance-system:latest
+docker run  -p 8080:80 \
+            -p 1515:1515 \
+            -e MYSQL_HOST=localhost \
+            -e MYSQL_PORT=3306 \
+            -e MYSQL_DATABASE=campus-surveillance-system \
+            -e MYSQL_USER=root \
+            -e MYSQL_PASSWORD=root \
+            -e JWT_SECRET=secret \
+            -- name campus-surveillance-system \
+            crazyher/campus-surveillance-system:latest
 ```
 
-算法端单独打包构建为 Docke Image：[crazyher/campus-surveillance-ai-end](https://hub.docker.com/repository/docker/crazyher/campus-surveillance-ai-end/general)
+其中容器内 80 端口是 HTTP 服务，1515 是 RTMP 服务
+
+监控算法端单独打包构建为 Docke Image：[crazyher/campus-surveillance-ai-end](https://hub.docker.com/repository/docker/crazyher/campus-surveillance-ai-end/general)
 
 ```shell
-docker run -e SERVER_URL="ws://localhost:8080" \
+docker run -e WS_SERVER_URL="ws://localhost/ws" \
+           -e RTMP_SERVER_URL="rtmp://localhost:1515/live" \
            -e ADMIN_USERNAME="admin" \
            -e ADMIN_PASSWORD="admin" \
            -e CAMERA_IDS="1,2,3" \
@@ -64,12 +76,14 @@ docker run -e SERVER_URL="ws://localhost:8080" \
 
 ### 监控算法端
 
-监控算法端使用 Python 编写，主要任务是拉取监控摄像头的 RTMP 推流，并对流画面基于深度学习算法进行截帧分析。
+监控算法端使用 Python 编写，主要任务是拉取监控摄像头提供的 RTSP/RTMP 流，以 RTMP 的格式推给本系统的 RTMP 服务器，同时对流画面基于深度学习算法进行实时检测。
 
-主要工作是基于 YOLO v8 模型做目标检测，将监控视频 RTMP 流的每帧（或固定间隔取一帧）画面做目标检测和分类，实时统计监控画面中目标（根据目前的功能要求，目标为人）的位置和数量，并判断是否触发异常报警。
+摄像头配置的获取和异常事件的上报通过与后端 Websocket 实时通信完成。
 
-区域入侵事件，是指画面中人的位置与监控划定的非法区域发生重叠；人员聚集事件，是指画面中划定的区域内人的数量超过阈值；人员离岗事件，是指画面中划定的区域内人的数量低于阈值。
+基本流程：
 
-得益于 YOLO v8 算法的高性能、低开销特点，监控算法端可以做到分布式边缘计算，即部署到监控摄像头侧；也可以统一部署在高性能集群上，对所有摄像头的推流画面进行计算。
-
-摄像头配置的获取、异常事件的上报通过与后端 Websocket 实时通信完成。
+1. 与后端建立 WS 连接
+2. 后端验证管理员账号密码，鉴权通过后由后端下发摄像头配置规则和拉流地址
+3. 为每一个摄像头创建工作进程，在其中：
+   - 启动子线程执行 ffmpeg 把摄像头原始拉流地址推流给 RTMP 服务器
+   - 对原始拉流地址基于配置的报警规则做实时目标检测。

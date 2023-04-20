@@ -73,8 +73,8 @@ export class AdminController {
       cameraStatus: this.cameraService.getCameraStatus(camera),
       latlng: [Number(camera.latitude), Number(camera.longitude)],
       cameraModel: camera.model,
-      hlsUrl: camera.hlsUrl,
-      rtmpUrl: camera.rtmpUrl,
+      hlsUrl: this.cameraService.getHlsUrl(camera.id),
+      rtspUrl: camera.rtspUrl,
       alarmRules:
         camera.alarmRules?.map((rule) => ({
           alarmRuleID: rule.id,
@@ -92,8 +92,7 @@ export class AdminController {
       model: body.cameraModel,
       latitude: body.latlng[0],
       longitude: body.latlng[1],
-      hlsUrl: body.hlsUrl,
-      rtmpUrl: body.rtmpUrl,
+      rtspUrl: body.rtspUrl,
       alarmRules:
         body.alarmRuleIDs?.map((id) => {
           const rule = new AlarmRule();
@@ -115,8 +114,7 @@ export class AdminController {
       model: body.cameraModel,
       latitude: body.latlng[0],
       longitude: body.latlng[1],
-      hlsUrl: body.hlsUrl,
-      rtmpUrl: body.rtmpUrl,
+      rtspUrl: body.rtspUrl,
       alarmRules: body.alarmRuleIDs.map((id) => {
         const rule = new AlarmRule();
         rule.id = id;

@@ -12,8 +12,7 @@ export class UtilsService {
     'PUBLIC_DIR_ABSOLUTE_PATH',
   );
 
-  private URLToPublicDir =
-    this.configService.getOrThrow<string>('URL_TO_PUBLIC_DIR');
+  private URLToPublicDir = '/public';
 
   /**
    * Write image file to the public path from base64

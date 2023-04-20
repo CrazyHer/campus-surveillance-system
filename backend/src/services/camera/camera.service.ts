@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Camera } from './camera.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CameraService {
   constructor(
     @InjectRepository(Camera) private cameraRepo: Repository<Camera>,
+    private configService: ConfigService,
   ) {}
 
   async getList(
@@ -53,5 +55,9 @@ export class CameraService {
 
   async deleteCamera(cameraID: number) {
     await this.cameraRepo.softDelete({ id: cameraID });
+  }
+
+  getHlsUrl(cameraID: number): string {
+    return '/hls/' + cameraID + '.m3u8';
   }
 }
