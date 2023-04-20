@@ -70,7 +70,7 @@ def main(
 if __name__ == "__main__":
     multiprocessing.freeze_support()
 
-    serverUrl = os.getenv("SERVER_URL", "ws://localhost:3000")
+    serverUrl = os.getenv("SERVER_URL", "ws://localhost/ws")
     adminUsername = os.getenv("ADMIN_USERNAME", "admin123")
     password = os.getenv("ADMIN_PASSWORD", "admin123")
     cameraIDs = os.getenv("CAMERA_IDS", "3").split(",")

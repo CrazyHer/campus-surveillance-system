@@ -36,12 +36,12 @@ const CameraInfo: FC<{
   useEffect(() => {
     fetchCameraInfo();
 
-    const timer = setInterval(() => {
-      fetchCameraInfo();
-    }, 10000);
-    return () => {
-      clearInterval(timer);
-    };
+    // const timer = setInterval(() => {
+    //   fetchCameraInfo();
+    // }, 10000);
+    // return () => {
+    //   clearInterval(timer);
+    // };
   }, [props.cameraID]);
 
   const handleResolveAlarm = async (eventID: number) => {

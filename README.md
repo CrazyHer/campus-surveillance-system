@@ -1,5 +1,8 @@
 # 基于服务器本地地图的园区视频监控 web 系统
 
+[![Docker Image Version (latest by date)](https://img.shields.io/docker/v/crazyher/campus-surveillance-system?label=Docker%20Image%3A%20campus-surveillance-system)](https://hub.docker.com/r/crazyher/campus-surveillance-system)
+[![Docker Image Version (latest by date)](https://img.shields.io/docker/v/crazyher/campus-surveillance-ai-end?label=Docker%20Image%3A%20campus-surveillance-ai-end)](https://hub.docker.com/r/crazyher/campus-surveillance-ai-end)
+
 ## 题目介绍
 
 摄像头已经成为公共区域和园区监控的主要检测设备。相较于公共区域，园区安防所使用的监控摄像头数量更多、分布也较为复杂。当今主流的传统视频监控系统并没有精确记录各个摄像头的地理位置信息和相对位置关系，而管理人员也只是将摄像头按照地理区域进行命名编号以区分，并不能在系统上直观地找到并分析各个摄像头之间的位置关系。当园区层数较多、地域空间复杂时，不便于监控的调取和管理。
@@ -20,6 +23,8 @@
 ![系统架构图](docs/system-framework.png)
 
 其中 RTMP 服务器只需要提供 RTMP 和 HLS 流的支持即可，在本系统中我们不关心其具体实现。可以使用 [nginx-rtmp-module](https://github.com/arut/nginx-rtmp-module) 在 nginx 上简单配置即可支持。
+
+若要自搭建地图切片服务器，可参考[openstreetmap-tile-server](https://github.com/Overv/openstreetmap-tile-server)，使用 Docker 搭建服务器提供本地 OpenStreetMap 地图切片
 
 ### 部署和使用
 

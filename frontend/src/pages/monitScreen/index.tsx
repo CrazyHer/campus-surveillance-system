@@ -27,12 +27,12 @@ const MonitScreen: FC = () => {
   useEffect(() => {
     fetchData();
 
-    const timer = setInterval(() => {
-      fetchData();
-    }, 10000);
-    return () => {
-      clearInterval(timer);
-    };
+    // const timer = setInterval(() => {
+    //   fetchData();
+    // }, 10000);
+    // return () => {
+    //   clearInterval(timer);
+    // };
   }, []);
 
   useEffect(() => {
