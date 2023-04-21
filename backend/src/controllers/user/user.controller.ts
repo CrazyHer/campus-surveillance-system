@@ -85,7 +85,7 @@ export class UserController {
       cameraName: camera.name,
       cameraID: camera.id,
       cameraStatus: this.cameraService.getCameraStatus(camera),
-      hlsUrl: camera.hlsUrl,
+      hlsUrl: this.cameraService.getHlsUrl(camera.id),
       latlng: [Number(camera.latitude), Number(camera.longitude)] as [
         number,
         number,
@@ -155,7 +155,7 @@ export class UserController {
       cameraID: camera.id,
       cameraName: camera.name,
       cameraStatus: this.cameraService.getCameraStatus(camera),
-      hlsUrl: camera.hlsUrl,
+      hlsUrl: this.cameraService.getHlsUrl(camera.id),
     }));
   }
 

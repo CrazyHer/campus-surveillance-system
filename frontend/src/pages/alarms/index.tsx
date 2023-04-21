@@ -13,7 +13,12 @@ import Styles from './index.module.less';
 type DataType = ServiceTypes['GET /api/user/getAlarmEvents']['res']['data'][0];
 const Alarms: FC = () => {
   const columns: Array<ColumnType<DataType>> = [
-    { title: '事件ID', dataIndex: 'eventID' },
+    {
+      title: '事件ID',
+      dataIndex: 'eventID',
+      sorter: (a, b) => a.eventID - b.eventID,
+      defaultSortOrder: 'descend',
+    },
     { title: '报警源摄像头名称', dataIndex: 'cameraName' },
     {
       title: '报警类型',
@@ -21,10 +26,8 @@ const Alarms: FC = () => {
       render: (_v, record) => <Tag>{record.alarmRule.alarmRuleName}</Tag>,
     },
     {
-      title: '监控位置',
-      dataIndex: 'cameraLatLng',
-      render: (_v, record) =>
-        `${record.cameraLatlng[0]},${record.cameraLatlng[1]}`,
+      title: '摄像头型号',
+      dataIndex: 'cameraModel',
     },
     {
       title: '状态',
@@ -39,6 +42,11 @@ const Alarms: FC = () => {
             未处理
           </Tag>
         ),
+      filters: [
+        { text: '已处理', value: true },
+        { text: '未处理', value: false },
+      ],
+      onFilter: (value, record) => record.resolved === value,
     },
     { title: '报警时间', dataIndex: 'alarmTime' },
     {

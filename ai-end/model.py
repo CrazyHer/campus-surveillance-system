@@ -3,10 +3,10 @@ from ultralytics import YOLO
 
 class YOLOModel:
     __model = None
-    conf = 0.25
+    conf = 0.5
     device = "cpu"
 
-    def __init__(self, conf=0.25, device="cpu"):
+    def __init__(self, conf=0.5, device="cpu"):
         self.conf = conf
         self.device = device
         self.__model = YOLO(model="./yolov8n.pt", task="detect")

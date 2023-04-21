@@ -34,8 +34,7 @@ interface AddFormData {
   Longitude: number;
   cameraModel: string;
   alarmRuleIDs: number[];
-  hlsUrl: string;
-  rtmpUrl: string;
+  rtspUrl: string;
 }
 
 interface EditFormData {
@@ -45,8 +44,7 @@ interface EditFormData {
   Longitude: number;
   cameraModel: string;
   alarmRuleIDs: number[];
-  hlsUrl: string;
-  rtmpUrl: string;
+  rtspUrl: string;
 }
 
 const CamerasManage: FC = () => {
@@ -134,8 +132,7 @@ const CamerasManage: FC = () => {
         latlng: [formData.Lattitude, formData.Longitude],
         cameraModel: formData.cameraModel,
         alarmRuleIDs: formData.alarmRuleIDs,
-        hlsUrl: formData.hlsUrl,
-        rtmpUrl: formData.rtmpUrl,
+        rtspUrl: formData.rtspUrl,
       });
       message.success('配置成功');
       setEditModalOpen(false);
@@ -155,8 +152,7 @@ const CamerasManage: FC = () => {
         latlng: [formData.Lattitude, formData.Longitude],
         cameraModel: formData.cameraModel,
         alarmRuleIDs: formData.alarmRuleIDs,
-        hlsUrl: formData.hlsUrl,
-        rtmpUrl: formData.rtmpUrl,
+        rtspUrl: formData.rtspUrl,
       });
       message.success('添加成功');
       setAddModalOpen(false);
@@ -297,11 +293,11 @@ const CamerasManage: FC = () => {
         <Input />
       </Form.Item>
 
-      <Form.Item label="HLS地址" name="hlsUrl" rules={[{ required: true }]}>
-        <Input />
-      </Form.Item>
-
-      <Form.Item label="RTMP地址" name="rtmpUrl" rules={[{ required: true }]}>
+      <Form.Item
+        label="RTSP拉流地址"
+        name="rtspUrl"
+        rules={[{ required: true }]}
+      >
         <Input />
       </Form.Item>
 

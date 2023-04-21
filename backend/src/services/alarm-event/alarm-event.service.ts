@@ -21,7 +21,6 @@ export class AlarmEventService {
         sourceCamera: withSourceCamera,
         alarmRule: withAlarmRule,
       },
-      order: { id: 'DESC' },
     });
   }
 
@@ -36,7 +35,6 @@ export class AlarmEventService {
         sourceCamera: withSourceCamera,
         alarmRule: withAlarmRule,
       },
-      order: { id: 'DESC' },
     });
   }
 

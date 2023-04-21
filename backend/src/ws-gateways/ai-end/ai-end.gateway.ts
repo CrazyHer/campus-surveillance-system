@@ -27,7 +27,7 @@ interface AlarmData {
 }
 
 interface CameraConfig {
-  rtmpUrl: string;
+  rtspUrl: string;
   alarmRules: AlarmRule[];
 }
 
@@ -89,7 +89,7 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!config) return;
       cameraConfig = {
         alarmRules: config?.alarmRules ?? [],
-        rtmpUrl: config.rtmpUrl,
+        rtspUrl: config.rtspUrl,
       };
     }
     client?.emit('cameraConfigChange', cameraConfig);

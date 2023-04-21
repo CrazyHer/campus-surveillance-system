@@ -24,10 +24,7 @@ export class Camera {
   online: boolean;
 
   @Column({ default: '' })
-  hlsUrl: string;
-
-  @Column({ default: '' })
-  rtmpUrl: string;
+  rtspUrl: string;
 
   @Column({ type: 'double' })
   latitude: number;

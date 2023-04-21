@@ -214,7 +214,8 @@ const MockApis: { [api in keyof ServiceTypes]: ServiceTypes[api]['res'] } = {
         cameraModel: '摄像头型号1',
         alarmRules: [{ alarmRuleID: 1, alarmRuleName: '报警规则1' }],
         hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
-        rtmpUrl: 'rtmp://live.hkstv.hk.lxdns.com/live/hks',
+        rtspUrl:
+          'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
       },
       {
         cameraName: '摄像头2',
@@ -224,7 +225,8 @@ const MockApis: { [api in keyof ServiceTypes]: ServiceTypes[api]['res'] } = {
         cameraModel: '摄像头型号2',
         alarmRules: [{ alarmRuleID: 2, alarmRuleName: '报警规则2' }],
         hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
-        rtmpUrl: 'rtmp://live.hkstv.hk.lxdns.com/live/hks',
+        rtspUrl:
+          'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
       },
       {
         cameraName: '摄像头3',
@@ -234,7 +236,8 @@ const MockApis: { [api in keyof ServiceTypes]: ServiceTypes[api]['res'] } = {
         cameraModel: '摄像头型号3',
         alarmRules: [{ alarmRuleID: 3, alarmRuleName: '报警规则3' }],
         hlsUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
-        rtmpUrl: 'rtmp://live.hkstv.hk.lxdns.com/live/hks',
+        rtspUrl:
+          'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
       },
     ],
     message: '',

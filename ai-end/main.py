@@ -6,18 +6,30 @@ import os
 
 # Windows推流本机摄像头到rtmp://localhost:1515/hls/3
 # ffmpeg -list_devices true -f dshow -i dummy
-# ffmpeg -f dshow -i video="USB2.0 HD UVC WebCam" -f dshow -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://192.169.3.3:1515/hls/3
+# ffmpeg -f dshow -i video="USB2.0 HD UVC WebCam" -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv rtmp://192.169.3.3:1515/live/3
+
+
+def ffmpegStreamToRtmpServer(streamUrl, rtmpUrl):
+    cmd = f'/bin/ffmpeg -hide_banner -loglevel error -i "{streamUrl}" -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv "{rtmpUrl}"'
+    print(cmd)
+    os.system(command=cmd)
+    pass
 
 
 async def beginWork(ws: WSClient):
     model = YOLOModel()
-    print(f"begin to detect video for camera {ws.cameraID}, rtmpUrl: {ws.rtmpUrl}")
-    print(f"if wait too long, please check if ffmpeg is running")
-    results = model.detectVideo(ws.rtmpUrl, classList=[0, 2])  # 0:person, 2:car
+
+    rtmpUrl = ws.rtmpServerUrl + "/" + ws.cameraID
+    ffmpegProcess = multiprocessing.Process(
+        target=ffmpegStreamToRtmpServer, args=(ws.rtspUrl, rtmpUrl)
+    )
+    ffmpegProcess.start()
+
+    print(f"Begin to detect video for camera {ws.cameraID}, rtmpUrl: {ws.rtspUrl}")
+    print(f"if wait too long, please check if the stream url is correct")
+    results = model.detectVideo(ws.rtspUrl, classList=[0, 2])  # 0:person, 2:car
 
     for frameResult in results:
-        # cv2.imshow(f"camera {ws.cameraID}", frameResult.plot())
-        # cv2.waitKey(1)
         clsCount = model.getResultClsCount(frameResult)
         await ws.trySendAlarm(
             {
@@ -33,15 +45,19 @@ async def beginWork(ws: WSClient):
                 "predictResult": frameResult,
             }
         )
+        if not ffmpegProcess.is_alive():
+            print(f"ffmpeg process for camera {ws.cameraID} is dead")
+            break
         await asyncio.sleep(1)
     pass
 
 
 async def detectVideoAndSendAlarmForCamera(
-    serverUrl="", adminUsername="", password="", cameraID=""
+    wsServerUrl="", rtmpServerUrl="", adminUsername="", password="", cameraID=""
 ):
     await WSClient(
-        serverUrl,
+        wsServerUrl,
+        rtmpServerUrl,
         adminUsername,
         password,
         str(cameraID),
@@ -52,6 +68,7 @@ async def detectVideoAndSendAlarmForCamera(
 
 def main(
     serverUrl="",
+    rtmpServerUrl="",
     adminUsername="",
     password="",
     cameraID="",
@@ -59,6 +76,7 @@ def main(
     asyncio.run(
         detectVideoAndSendAlarmForCamera(
             serverUrl,
+            rtmpServerUrl,
             adminUsername,
             password,
             cameraID,
@@ -70,16 +88,18 @@ def main(
 if __name__ == "__main__":
     multiprocessing.freeze_support()
 
-    serverUrl = os.getenv("SERVER_URL", "ws://localhost:3000")
+    wsServerUrl = os.getenv("WS_SERVER_URL", "ws://localhost/ws")
+    rtmpServerUrl = os.getenv("RTMP_SERVER_URL", "rtmp://localhost:1515/live")
     adminUsername = os.getenv("ADMIN_USERNAME", "admin123")
     password = os.getenv("ADMIN_PASSWORD", "admin123")
-    cameraIDs = os.getenv("CAMERA_IDS", "3").split(",")
+    cameraIDs = os.getenv("CAMERA_IDS", "11,13").split(",")
 
     processes = []
     # start a process for each camera
     for cameraID in cameraIDs:
         p = multiprocessing.Process(
-            target=main, args=(serverUrl, adminUsername, password, cameraID)
+            target=main,
+            args=(wsServerUrl, rtmpServerUrl, adminUsername, password, cameraID),
         )
         p.start()
         processes.append(p)
