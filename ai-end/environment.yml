@@ -2,7 +2,8 @@ name: pytorch
 channels:
   - pytorch
   - nvidia
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://repo.anaconda.com/pkgs/main/
+  - https://repo.anaconda.com/pkgs/free/
   - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
   - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
   - defaults
