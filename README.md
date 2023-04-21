@@ -5,12 +5,12 @@
     <img src="https://img.shields.io/docker/v/crazyher/campus-surveillance-system?label=campus-surveillance-system" alt="campus-surveillance-system"/>
   </a>
 
-  <a href="https://hub.docker.com/r/crazyher/campus-surveillance-system">
+  <a href="https://hub.docker.com/r/crazyher/campus-surveillance-ai-end">
     <img src="https://img.shields.io/docker/v/crazyher/campus-surveillance-ai-end?label=campus-surveillance-ai-end" alt="campus-surveillance-ai-end"/>
   </a>
 
-  <a href="https://hub.docker.com/r/crazyher/campus-surveillance-system">
-    <img src="https://img.shields.io/github/actions/workflow/status/CrazyHer/campus-surveillance-system/lint.yaml?label=Lint%20Test" alt="Lint Test"/>
+  <a href="https://github.com/CrazyHer/campus-surveillance-system/actions/workflows/lint.yaml">
+    <img src="https://github.com/CrazyHer/campus-surveillance-system/actions/workflows/lint.yaml/badge.svg" alt="Lint Test"/>
   </a>
 
   <a href="https://github.com/CrazyHer/campus-surveillance-system/actions/workflows/docker-image.yaml">
