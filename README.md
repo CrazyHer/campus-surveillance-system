@@ -48,8 +48,8 @@ docker run  -p 8080:80 \
             -e MYSQL_USER=root \
             -e MYSQL_PASSWORD=root \
             -e JWT_SECRET=secret \
-            -- name campus-surveillance-system \
-            crazyher/campus-surveillance-system:latest
+            --name campus-surveillance-system \
+            -d crazyher/campus-surveillance-system:latest
 ```
 
 其中容器内 80 端口是 HTTP 服务，1515 是 RTMP 服务
@@ -63,7 +63,7 @@ docker run -e WS_SERVER_URL="ws://localhost/ws" \
            -e ADMIN_PASSWORD="admin" \
            -e CAMERA_IDS="1,2,3" \
            --name campus-surveillance-ai-end \
-           crazyher/campus-surveillance-ai-end:latest
+           -d crazyher/campus-surveillance-ai-end:latest
 ```
 
 ### 前端

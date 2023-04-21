@@ -1,4 +1,5 @@
 import { defineConfig } from 'umi';
+import zhCN from 'antd/locale/zh_CN';
 
 export default defineConfig({
   plugins: ['@umijs/plugins/dist/antd', '@umijs/plugins/dist/locale'],
@@ -23,8 +24,8 @@ export default defineConfig({
   ],
   clientLoader: {},
   npmClient: 'pnpm',
-  antd: {},
-  locale: { default: 'zh-CN' },
+  antd: { configProvider: { locale: zhCN } },
+  locale: { default: 'zh-CN', antd: false, baseSeparator: '-' },
   publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
   history: { type: 'hash' },
 });

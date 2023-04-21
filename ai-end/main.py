@@ -6,11 +6,11 @@ import os
 
 # Windows推流本机摄像头到rtmp://localhost:1515/hls/3
 # ffmpeg -list_devices true -f dshow -i dummy
-# ffmpeg -f dshow -i video="USB2.0 HD UVC WebCam" -f dshow -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://192.169.3.3:1515/live/3
+# ffmpeg -f dshow -i video="USB2.0 HD UVC WebCam" -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv rtmp://192.169.3.3:1515/live/3
 
 
 def ffmpegStreamToRtmpServer(streamUrl, rtmpUrl):
-    cmd = f'ffmpeg -i "{streamUrl}" -c:v copy -f flv "{rtmpUrl}"'
+    cmd = f'/bin/ffmpeg -hide_banner -loglevel error -i "{streamUrl}" -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv "{rtmpUrl}"'
     print(cmd)
     os.system(command=cmd)
     pass
@@ -26,12 +26,10 @@ async def beginWork(ws: WSClient):
     ffmpegProcess.start()
 
     print(f"Begin to detect video for camera {ws.cameraID}, rtmpUrl: {ws.rtspUrl}")
-    print(f"if wait too long, please check if ffmpeg is running")
+    print(f"if wait too long, please check if the stream url is correct")
     results = model.detectVideo(ws.rtspUrl, classList=[0, 2])  # 0:person, 2:car
 
     for frameResult in results:
-        # cv2.imshow(f"camera {ws.cameraID}", frameResult.plot())
-        # cv2.waitKey(1)
         clsCount = model.getResultClsCount(frameResult)
         await ws.trySendAlarm(
             {
@@ -94,7 +92,7 @@ if __name__ == "__main__":
     rtmpServerUrl = os.getenv("RTMP_SERVER_URL", "rtmp://localhost:1515/live")
     adminUsername = os.getenv("ADMIN_USERNAME", "admin123")
     password = os.getenv("ADMIN_PASSWORD", "admin123")
-    cameraIDs = os.getenv("CAMERA_IDS", "3").split(",")
+    cameraIDs = os.getenv("CAMERA_IDS", "11,13").split(",")
 
     processes = []
     # start a process for each camera

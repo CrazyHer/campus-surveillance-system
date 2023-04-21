@@ -1,13 +1,13 @@
 import type ServiceTypes from '@/services/serviceTypes';
 import { observer } from 'mobx-react';
-import { type FC, useEffect, useRef, useState } from 'react';
-import HLS from 'hls.js';
+import { type FC, useEffect, useState } from 'react';
 import { Button, Card, Descriptions, message, Spin, Table, Tag } from 'antd';
 import Styles from './index.module.less';
 import { type ColumnType } from 'antd/es/table';
 import constants from '@/constants';
 import services from '@/services';
 import CameraStatusBadge from '@/components/cameraStatusBadge';
+import HlsPlayer from '@/components/hlsPlayer';
 const CameraInfo: FC<{
   cameraID: number;
 }> = (props) => {
@@ -36,12 +36,12 @@ const CameraInfo: FC<{
   useEffect(() => {
     fetchCameraInfo();
 
-    // const timer = setInterval(() => {
-    //   fetchCameraInfo();
-    // }, 10000);
-    // return () => {
-    //   clearInterval(timer);
-    // };
+    const timer = setInterval(() => {
+      fetchCameraInfo();
+    }, 10000);
+    return () => {
+      clearInterval(timer);
+    };
   }, [props.cameraID]);
 
   const handleResolveAlarm = async (eventID: number) => {
@@ -77,6 +77,8 @@ const CameraInfo: FC<{
         ) : (
           <div style={{ color: 'red' }}>{value}</div>
         ),
+      sortOrder: 'descend',
+      sorter: (a, b) => a.eventID - b.eventID,
     },
     {
       title: '报警类型',
@@ -100,45 +102,11 @@ const CameraInfo: FC<{
             }}
             loading={resolveLoading}
           >
-            处理
+            快速处理
           </Button>
         ),
     },
   ];
-
-  const [videoLoading, setVideoLoading] = useState(false);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    if (
-      videoRef.current != null &&
-      data != null &&
-      data?.cameraStatus !== constants.cameraStatus.OFFLINE
-    ) {
-      setVideoLoading(true);
-      if (
-        videoRef.current.canPlayType('application/vnd.apple.mpegurl').length > 0
-      ) {
-        videoRef.current.src = data.hlsUrl;
-      } else if (HLS.isSupported()) {
-        const hlsPlayer = new HLS(constants.HLS_LOWLATENCY_OPTION);
-        hlsPlayer.loadSource(data.hlsUrl);
-        hlsPlayer.attachMedia(videoRef.current);
-        return () => {
-          hlsPlayer.detachMedia();
-          hlsPlayer.destroy();
-        };
-      } else {
-        videoRef.current.innerText = '您的浏览器不支持查看摄像头视频';
-        setVideoLoading(false);
-      }
-    }
-  }, [data?.hlsUrl, data?.cameraStatus]);
-
-  const handleError = () => {
-    setVideoLoading(false);
-    message.error('视频加载失败');
-  };
 
   return (
     <Card
@@ -146,59 +114,54 @@ const CameraInfo: FC<{
       className={Styles.cameraInfoCard}
       bordered={false}
       size="small"
-      loading={fetchLoading}
     >
-      {data?.cameraStatus !== constants.cameraStatus.OFFLINE && (
-        <Spin spinning={videoLoading}>
-          <video
-            onPlay={() => {
-              setVideoLoading(false);
-            }}
-            onError={handleError}
-            ref={videoRef}
-            className={Styles.cameraVideo}
-            autoPlay={true}
-            muted
-          />
-        </Spin>
-      )}
+      <Spin spinning={fetchLoading}>
+        {data && data?.cameraStatus !== constants.cameraStatus.OFFLINE && (
+          <HlsPlayer item={data} className={Styles.cameraVideo} />
+        )}
 
-      <Descriptions column={1} size="small" className={Styles.cameraDesc}>
-        <Descriptions.Item label="名称">{data?.cameraName}</Descriptions.Item>
-        <Descriptions.Item label="坐标">
-          纬度：{data?.latlng[0]} <br />
-          经度：{data?.latlng[1]}
-        </Descriptions.Item>
-        <Descriptions.Item label="型号">{data?.cameraModel}</Descriptions.Item>
-        <Descriptions.Item label="状态">
-          <CameraStatusBadge
-            status={data?.cameraStatus as 'normal' | 'offline' | 'alarm'}
-          />
-        </Descriptions.Item>
-        <Descriptions.Item label="报警规则">
-          {data?.alarmRules.map((rule) => (
-            <Tag key={rule.alarmRuleID}>{rule.alarmRuleName}</Tag>
-          ))}
-        </Descriptions.Item>
-      </Descriptions>
-      <Descriptions
-        layout="vertical"
-        column={1}
-        size="small"
-        className={Styles.cameraDesc}
-      >
-        <Descriptions.Item label="异常报警事件">
-          <Table
-            pagination={{ pageSizeOptions: [5, 10] }}
-            size="small"
-            columns={tableColumns}
-            dataSource={data?.alarmEvents}
-            showHeader={false}
-            rowKey="eventID"
-            className={Styles.alarmEventsTable}
-          />
-        </Descriptions.Item>
-      </Descriptions>
+        <Descriptions column={1} size="small" className={Styles.cameraDesc}>
+          <Descriptions.Item label="摄像头ID">
+            {data?.cameraID}
+          </Descriptions.Item>
+          <Descriptions.Item label="名称">{data?.cameraName}</Descriptions.Item>
+          <Descriptions.Item label="坐标">
+            纬度：{data?.latlng[0]} <br />
+            经度：{data?.latlng[1]}
+          </Descriptions.Item>
+          <Descriptions.Item label="型号">
+            {data?.cameraModel}
+          </Descriptions.Item>
+          <Descriptions.Item label="状态">
+            <CameraStatusBadge
+              status={data?.cameraStatus as 'normal' | 'offline' | 'alarm'}
+            />
+          </Descriptions.Item>
+          <Descriptions.Item label="报警规则">
+            {data?.alarmRules.map((rule) => (
+              <Tag key={rule.alarmRuleID}>{rule.alarmRuleName}</Tag>
+            ))}
+          </Descriptions.Item>
+        </Descriptions>
+        <Descriptions
+          layout="vertical"
+          column={1}
+          size="small"
+          className={Styles.cameraDesc}
+        >
+          <Descriptions.Item label="异常报警事件">
+            <Table
+              pagination={{ pageSizeOptions: [5, 10] }}
+              size="small"
+              columns={tableColumns}
+              dataSource={data?.alarmEvents}
+              showHeader={false}
+              rowKey="eventID"
+              className={Styles.alarmEventsTable}
+            />
+          </Descriptions.Item>
+        </Descriptions>
+      </Spin>
     </Card>
   );
 };
