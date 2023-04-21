@@ -12,6 +12,11 @@
   <a href="https://hub.docker.com/r/crazyher/campus-surveillance-system">
     <img src="https://img.shields.io/github/actions/workflow/status/CrazyHer/campus-surveillance-system/lint.yaml?label=Lint%20Test" alt="Lint Test"/>
   </a>
+
+  <a href="https://github.com/CrazyHer/campus-surveillance-system/actions/workflows/docker-image.yaml">
+    <img src="https://github.com/CrazyHer/campus-surveillance-system/actions/workflows/docker-image.yaml/badge.svg" alt="Docker Image CI"/>
+  </a>
+
 </p>
 
 ## 题目介绍
