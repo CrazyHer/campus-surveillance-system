@@ -23,7 +23,7 @@ import { WsGatewaysModule } from './ws-gateways/ws-gateways.module';
         timezone: 'Z',
       }),
     }),
-    CacheModule.register({ isGlobal: true }),
+    CacheModule.register({ isGlobal: true, ttl: 0, max: 0 }),
     ServeStaticModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => [
