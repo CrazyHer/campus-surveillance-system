@@ -10,77 +10,80 @@ import os
 
 
 def ffmpegStreamToRtmpServer(streamUrl, rtmpUrl):
-    cmd = f'/bin/ffmpeg -hide_banner -loglevel error -i "{streamUrl}" -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv "{rtmpUrl}"'
-    print(cmd)
-    os.system(command=cmd)
+    print("exec ffmpeg...")
+    os.execvp(
+        "/bin/ffmpeg",
+        f"/bin/ffmpeg -hide_banner -loglevel error -i {streamUrl} -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv {rtmpUrl}".split(
+            " "
+        ),
+    )
     pass
 
 
 async def beginWork(ws: WSClient):
-    model = YOLOModel()
-
     rtmpUrl = ws.rtmpServerUrl + "/" + ws.cameraID
     ffmpegProcess = multiprocessing.Process(
-        target=ffmpegStreamToRtmpServer, args=(ws.rtspUrl, rtmpUrl)
+        target=ffmpegStreamToRtmpServer, args=(ws.rtspUrl, rtmpUrl), daemon=True
     )
-    ffmpegProcess.start()
+    try:
+        model = YOLOModel()
 
-    print(f"Begin to detect video for camera {ws.cameraID}, rtmpUrl: {ws.rtspUrl}")
-    print(f"if wait too long, please check if the stream url is correct")
-    results = model.detectVideo(ws.rtspUrl, classList=[0, 2])  # 0:person, 2:car
+        ffmpegProcess.start()
 
-    for frameResult in results:
-        clsCount = model.getResultClsCount(frameResult)
-        await ws.trySendAlarm(
-            {
-                "algorithmType": "body",
-                "count": clsCount.get("person", 0),
-                "predictResult": frameResult,
-            }
+        print(
+            f"Begin to detect video for camera {ws.cameraID}, streamUrl: {ws.rtspUrl}"
         )
-        await ws.trySendAlarm(
-            {
-                "algorithmType": "vehicle",
-                "count": clsCount.get("car", 0),
-                "predictResult": frameResult,
-            }
-        )
-        if not ffmpegProcess.is_alive():
-            print(f"ffmpeg process for camera {ws.cameraID} is dead")
-            break
-        await asyncio.sleep(1)
-    pass
+        print(f"if wait too long, please check if the stream url is correct")
+        results = model.detectVideo(ws.rtspUrl, classList=[0, 2])  # 0:person, 2:car
 
+        for frameResult in results:
+            clsCount = model.getResultClsCount(frameResult)
+            await ws.trySendAlarm(
+                {
+                    "algorithmType": "body",
+                    "count": clsCount.get("person", 0),
+                    "predictResult": frameResult,
+                }
+            )
+            await ws.trySendAlarm(
+                {
+                    "algorithmType": "vehicle",
+                    "count": clsCount.get("car", 0),
+                    "predictResult": frameResult,
+                }
+            )
+            if not ffmpegProcess.is_alive():
+                print(f"ffmpeg process for camera {ws.cameraID} is dead")
+                break
+            await asyncio.sleep(ws.context.get("interval", 1))
 
-async def detectVideoAndSendAlarmForCamera(
-    wsServerUrl="", rtmpServerUrl="", adminUsername="", password="", cameraID=""
-):
-    await WSClient(
-        wsServerUrl,
-        rtmpServerUrl,
-        adminUsername,
-        password,
-        str(cameraID),
-        beginWork,
-    ).stayConnected()
+            pass
+    finally:
+        ffmpegProcess.kill()
+        await ws.disconnect()
+        print("error, kill ffmpeg process")
+
     pass
 
 
 def main(
-    serverUrl="",
+    wsServerUrl="",
     rtmpServerUrl="",
     adminUsername="",
     password="",
     cameraID="",
+    detectionInterval=1,
 ):
     asyncio.run(
-        detectVideoAndSendAlarmForCamera(
-            serverUrl,
+        WSClient(
+            wsServerUrl,
             rtmpServerUrl,
             adminUsername,
             password,
-            cameraID,
-        )
+            str(cameraID),
+            beginWork,
+            {"interval": detectionInterval},
+        ).stayConnected()
     )
     pass
 
@@ -92,14 +95,22 @@ if __name__ == "__main__":
     rtmpServerUrl = os.getenv("RTMP_SERVER_URL", "rtmp://localhost:1515/live")
     adminUsername = os.getenv("ADMIN_USERNAME", "admin123")
     password = os.getenv("ADMIN_PASSWORD", "admin123")
-    cameraIDs = os.getenv("CAMERA_IDS", "11,13").split(",")
+    cameraIDs = os.getenv("CAMERA_IDS", "3").split(",")
+    detectionInterval = os.getenv("DETECTION_INTERVAL", 1)
 
     processes = []
     # start a process for each camera
     for cameraID in cameraIDs:
         p = multiprocessing.Process(
             target=main,
-            args=(wsServerUrl, rtmpServerUrl, adminUsername, password, cameraID),
+            args=(
+                wsServerUrl,
+                rtmpServerUrl,
+                adminUsername,
+                password,
+                cameraID,
+                detectionInterval,
+            ),
         )
         p.start()
         processes.append(p)

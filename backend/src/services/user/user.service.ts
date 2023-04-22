@@ -1,14 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
     private jwtService: JwtService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
 
   async getUserList(): Promise<User[]> {
@@ -22,7 +24,9 @@ export class UserService {
   }
 
   async genToken(user: User): Promise<string> {
-    return 'Bearer ' + (await this.jwtService.signAsync({ ...user }));
+    const token = await this.jwtService.signAsync({ ...user });
+    await this.cache.set(user.username, token);
+    return 'Bearer ' + token;
   }
 
   async getByUsername(username: string): Promise<User | null> {
@@ -40,5 +44,6 @@ export class UserService {
 
   async deleteUser(username: string) {
     await this.userRepo.softDelete({ username });
+    await this.cache.del(username);
   }
 }

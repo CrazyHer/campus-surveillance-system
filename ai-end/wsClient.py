@@ -18,8 +18,8 @@ class WSClient:
     connected = False
     ready = False
 
-    def onReady():
-        return None
+    async def onReady(self):
+        pass
 
     username = None
     password = None
@@ -50,14 +50,17 @@ class WSClient:
 
     throttleTime = 60  # seconds
 
+    context = {}
+
     def __init__(
         self,
-        wsServerUrl,
-        rtmpServerUrl,
-        username,
-        password,
-        cameraID,
-        onReady=lambda: Any,
+        wsServerUrl: str,
+        rtmpServerUrl: str,
+        username: str,
+        password: str,
+        cameraID: str,
+        onReady: Any,
+        context: dict = {},
     ) -> None:
         self.wsServerUrl = wsServerUrl
         self.rtmpServerUrl = rtmpServerUrl
@@ -69,6 +72,7 @@ class WSClient:
         ).decode("utf-8")
         self.cameraID = cameraID
         self.onReady = onReady
+        self.context = context
 
         self.sio.on("cameraConfigChange", self.onCameraConfigChange)
 
@@ -96,7 +100,6 @@ class WSClient:
         pass
 
     async def sendMessage(self, msg):
-        await self.connect()
         await self.sio.emit("message", msg)
         print("message sent")
         pass
@@ -109,7 +112,9 @@ class WSClient:
             'predictResult': Any
         }
         """
-        if not self.ready or self.alarmRules is None:
+        if not self.ready:
+            raise Exception("not ready or disconnected")
+        if self.alarmRules is None:
             return None
         for rule in self.alarmRules:
             if (
@@ -142,7 +147,6 @@ class WSClient:
             'predictResult': Any
         }
         """
-        await self.connect()
         rule = self.matchAlarmRule(data)
         if rule is None:
             return
@@ -175,6 +179,11 @@ class WSClient:
         pass
 
     async def onCameraConfigChange(self, data):
+        if self.rtspUrl is not None and self.rtspUrl != data["rtspUrl"]:
+            print(f"Camera {self.cameraID} rtsp url changed, disconnecting...")
+            await self.disconnect()
+            return
+
         self.rtspUrl = data["rtspUrl"]
         self.alarmRules = data["alarmRules"]
         print(f"Camera {self.cameraID} config updated")
@@ -182,6 +191,7 @@ class WSClient:
         if self.ready is False:
             self.ready = True
             asyncio.get_event_loop().create_task(self.onReady(self))
+
         pass
 
     async def stayConnected(self):
@@ -195,6 +205,8 @@ class WSClient:
 
     def onDisconnect(self):
         print(f"camera {self.cameraID} disconnected from server")
+        self.connected = False
+        self.ready = False
         pass
 
     def onConnectError(self, err):
