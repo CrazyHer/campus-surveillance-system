@@ -62,11 +62,10 @@ docker run  -p 8080:80 \
 监控算法端单独打包构建为 Docke Image：[crazyher/campus-surveillance-ai-end](https://hub.docker.com/repository/docker/crazyher/campus-surveillance-ai-end/general)
 
 ```shell
-docker run -e WS_SERVER_URL="ws://localhost/ws" \
+docker run -e HTTP_SERVER_URL="http://localhost" \
            -e RTMP_SERVER_URL="rtmp://localhost:1515/live" \
            -e ADMIN_USERNAME="admin" \
            -e ADMIN_PASSWORD="admin" \
-           -e CAMERA_IDS="1,2,3" \
            --name campus-surveillance-ai-end \
            -d crazyher/campus-surveillance-ai-end:latest
 ```

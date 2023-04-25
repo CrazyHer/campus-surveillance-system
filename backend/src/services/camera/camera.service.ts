@@ -20,6 +20,12 @@ export class CameraService {
     });
   }
 
+  async getOfflineList(): Promise<Camera[]> {
+    return await this.cameraRepo.find({
+      where: { online: false },
+    });
+  }
+
   async getById(
     cameraID: number,
     withAlarmRules = false,

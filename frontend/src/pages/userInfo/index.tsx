@@ -128,6 +128,9 @@ const UserInfo: FC = () => {
               e.preventDefault();
               fetchData();
             }}
+            labelCol={{ span: 2 }}
+            // labelAlign="left"
+            wrapperCol={{ span: 8 }}
           >
             <Form.Item label="头像">
               <ImgCrop rotationSlider showReset cropShape="round">
@@ -196,7 +199,7 @@ const UserInfo: FC = () => {
               <Input type="tel" />
             </Form.Item>
 
-            <Form.Item>
+            <Form.Item wrapperCol={{ offset: 2 }}>
               <Button type="primary" htmlType="submit">
                 保存
               </Button>
@@ -208,7 +211,13 @@ const UserInfo: FC = () => {
         </Card>
 
         <Card title="修改密码" className={Styles.passwordEditCard}>
-          <Form form={passwordForm} onFinish={handlePasswordSubmit}>
+          <Form
+            form={passwordForm}
+            onFinish={handlePasswordSubmit}
+            labelCol={{ span: 2 }}
+            // labelAlign="left"
+            wrapperCol={{ span: 8 }}
+          >
             <Form.Item
               label="原密码"
               name="oldPassword"
@@ -248,7 +257,7 @@ const UserInfo: FC = () => {
               <Input.Password type="password" />
             </Form.Item>
 
-            <Form.Item>
+            <Form.Item wrapperCol={{ offset: 2 }}>
               <Button type="primary" htmlType="submit">
                 保存
               </Button>

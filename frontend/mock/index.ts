@@ -360,6 +360,11 @@ const MockApis: { [api in keyof ServiceTypes]: ServiceTypes[api]['res'] } = {
     message: '',
     success: true,
   },
+  'GET /api/ai/getOfflineCameraList': {
+    data: [{ cameraID: 1 }, { cameraID: 2 }, { cameraID: 3 }],
+    message: '',
+    success: true,
+  },
 };
 
 export default MockApis;

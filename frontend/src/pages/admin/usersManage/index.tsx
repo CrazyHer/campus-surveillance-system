@@ -219,7 +219,7 @@ const UsersManage: FC = () => {
             </Button.Group>
           }
         >
-          <Form form={addForm} requiredMark="optional">
+          <Form form={addForm} labelCol={{ span: 3 }} labelAlign="right">
             <Form.Item
               label="账号"
               name="username"
@@ -261,7 +261,7 @@ const UsersManage: FC = () => {
             </Button.Group>
           }
         >
-          <Form form={editForm} requiredMark="optional">
+          <Form form={editForm} labelCol={{ span: 4 }} labelAlign="right">
             <Form.Item
               label="用户名"
               name="username"

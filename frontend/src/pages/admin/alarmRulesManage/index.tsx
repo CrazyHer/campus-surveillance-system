@@ -380,7 +380,12 @@ const AlarmRulesManage: FC = () => {
             </Button.Group>
           }
         >
-          <Form form={addForm} requiredMark={false}>
+          <Form
+            form={addForm}
+            requiredMark={false}
+            labelCol={{ span: 5 }}
+            labelAlign="right"
+          >
             {commonFormItems}
           </Form>
         </Modal>
@@ -406,7 +411,12 @@ const AlarmRulesManage: FC = () => {
             </Button.Group>
           }
         >
-          <Form form={editForm} requiredMark={false}>
+          <Form
+            form={editForm}
+            requiredMark={false}
+            labelCol={{ span: 5 }}
+            labelAlign="right"
+          >
             <Form.Item
               label="规则ID"
               name="alarmRuleID"

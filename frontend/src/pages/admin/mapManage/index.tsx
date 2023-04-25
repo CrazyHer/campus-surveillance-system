@@ -248,6 +248,10 @@ const MapManage: FC = () => {
             onFinish={handleSubmit}
             onReset={handleReset}
             requiredMark={false}
+            labelCol={{ span: 2 }}
+            labelAlign="right"
+            labelWrap
+            wrapperCol={{ span: 12 }}
           >
             <Form.Item
               label="地图源"
@@ -309,6 +313,7 @@ const MapManage: FC = () => {
                   valuePropName="fileList"
                   getValueFromEvent={(e) => e?.fileList}
                   rules={[{ required: true }]}
+                  labelCol={{ span: 3.5 }}
                 >
                   <Upload
                     beforeUpload={() => false}
@@ -391,7 +396,7 @@ const MapManage: FC = () => {
               </>
             )}
 
-            <Form.Item>
+            <Form.Item wrapperCol={{ offset: 2 }}>
               <Space>
                 <Button
                   type="primary"
