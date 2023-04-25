@@ -3,6 +3,29 @@ from wsClient import WSClient
 import asyncio
 import multiprocessing
 import os
+import requests
+import base64
+import hashlib
+import hmac
+
+
+def getOfflineCameraIDs(httpServerUrl, adminUsername, password):
+    __SHA256KEY = "campus-surveillance-system".encode("utf-8")
+    r = requests.get(
+        httpServerUrl + "/api/ai/getOfflineCameraList",
+        params={
+            "adminUsername": adminUsername,
+            "password": base64.b64encode(
+                hmac.new(__SHA256KEY, password.encode("utf-8"), hashlib.sha256).digest()
+            ).decode("utf-8"),
+        },
+    )
+    res = r.json()
+    if not res["success"]:
+        raise Exception(res["message"])
+
+    return list(map(lambda x: x["cameraID"], res["data"]))
+
 
 # Windows推流本机摄像头到rtmp://localhost:1515/hls/3
 # ffmpeg -list_devices true -f dshow -i dummy
@@ -90,12 +113,17 @@ def main(
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-
-    wsServerUrl = os.getenv("WS_SERVER_URL", "ws://localhost/ws")
+    httpServerUrl = os.getenv("HTTP_SERVER_URL", "http://localhost")
+    wsServerUrl = httpServerUrl + "/ws"
     rtmpServerUrl = os.getenv("RTMP_SERVER_URL", "rtmp://localhost:1515/live")
     adminUsername = os.getenv("ADMIN_USERNAME", "admin123")
     password = os.getenv("ADMIN_PASSWORD", "admin123")
-    cameraIDs = os.getenv("CAMERA_IDS", "3").split(",")
+    cameraIDs = []
+    if os.getenv("CAMERA_IDS") is not None:
+        cameraIDs = os.getenv("CAMERA_IDS").split(",")
+    else:
+        cameraIDs = getOfflineCameraIDs(httpServerUrl, adminUsername, password)
+
     detectionInterval = os.getenv("DETECTION_INTERVAL", 1)
 
     processes = []

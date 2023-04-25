@@ -366,7 +366,14 @@ const CamerasManage: FC = () => {
           </>
         }
       >
-        <Form form={addCameraForm}>{commonFormItems}</Form>
+        <Form
+          form={addCameraForm}
+          labelCol={{ span: 6 }}
+          labelAlign="right"
+          requiredMark="optional"
+        >
+          {commonFormItems}
+        </Form>
       </Modal>
 
       <Modal
@@ -405,8 +412,17 @@ const CamerasManage: FC = () => {
           </>
         }
       >
-        <Form form={editCameraForm}>
-          <Form.Item label="摄像头ID" name="cameraID">
+        <Form
+          form={editCameraForm}
+          labelCol={{ span: 6 }}
+          labelAlign="right"
+          requiredMark="optional"
+        >
+          <Form.Item
+            label="摄像头ID"
+            name="cameraID"
+            rules={[{ required: true }]}
+          >
             <Input disabled />
           </Form.Item>
           {commonFormItems}

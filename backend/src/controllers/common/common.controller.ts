@@ -1,4 +1,13 @@
-import { Body, Controller, ForbiddenException, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Post,
+  Query,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { CameraService } from 'src/services/camera/camera.service';
 
 import { UserService } from 'src/services/user/user.service';
 import { UtilsService } from 'src/services/utils/utils.service';
@@ -9,6 +18,7 @@ export class CommonController {
   constructor(
     private readonly userService: UserService,
     private utilService: UtilsService,
+    private cameraService: CameraService,
   ) {}
 
   @Post('/api/user/login')
@@ -32,5 +42,21 @@ export class CommonController {
         },
       };
     } else throw new ForbiddenException('用户名或密码错误');
+  }
+
+  @Get('/api/ai/getOfflineCameraList')
+  async getOfflineCameraList(
+    @Query() data: FetchTypes['GET /api/ai/getOfflineCameraList']['req'],
+  ): Promise<FetchTypes['GET /api/ai/getOfflineCameraList']['res']['data']> {
+    const user = await this.userService.authLogin(
+      data.adminUsername,
+      data.password,
+    );
+    if (!user || user.role !== 'admin') throw new UnauthorizedException();
+
+    const list = await this.cameraService.getOfflineList();
+    return list.map((camera) => ({
+      cameraID: camera.id,
+    }));
   }
 }

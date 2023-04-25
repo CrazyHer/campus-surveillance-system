@@ -400,6 +400,19 @@ export interface FetchTypes {
       success: boolean;
     };
   };
+  'GET /api/ai/getOfflineCameraList': {
+    req: {
+      adminUsername: string;
+      password: string;
+    };
+    res: {
+      data: {
+        cameraID: number;
+      }[];
+      message: string;
+      success: boolean;
+    };
+  };
 }
 
 export type fetchUrls = keyof FetchTypes extends `${string} ${infer Url}`
