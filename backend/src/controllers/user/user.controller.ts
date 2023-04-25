@@ -254,8 +254,8 @@ export class UserController {
       mapOptions: {
         center: config.mapCenter,
         zoom: config.mapZoom,
-        minZoom: config.mapZoom,
-        maxZoom: config.mapZoom,
+        minZoom: config.minZoom,
+        maxZoom: config.maxZoom,
         attributionControl: false,
         zoomControl: false,
       },
