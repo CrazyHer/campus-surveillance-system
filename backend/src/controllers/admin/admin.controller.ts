@@ -49,6 +49,8 @@ export class AdminController {
         imageLayerBounds: body.layer.bounds,
         mapCenter: body.mapOptions.center,
         mapZoom: body.mapOptions.zoom,
+        minZoom: body.mapOptions.minZoom,
+        maxZoom: body.mapOptions.maxZoom,
       });
     } else {
       await this.mapConfigService.updateConfig({
@@ -56,6 +58,8 @@ export class AdminController {
         layerUrlOrPath: body.layer.url,
         mapCenter: body.mapOptions.center,
         mapZoom: body.mapOptions.zoom,
+        minZoom: body.mapOptions.minZoom,
+        maxZoom: body.mapOptions.maxZoom,
       });
     }
 

@@ -29,6 +29,12 @@ export class MapConfig {
   @Column({ type: 'int' })
   mapZoom: number;
 
+  @Column({ type: 'int', default: 0 })
+  minZoom: number;
+
+  @Column({ type: 'int', default: 18 })
+  maxZoom: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

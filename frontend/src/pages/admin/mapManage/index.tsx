@@ -46,6 +46,8 @@ type IFormData =
       centerLat: number;
       centerLnt: number;
       zoomLevel: number;
+      minZoomLevel: number;
+      maxZoomLevel: number;
     }
   | {
       sourceType: 'custom';
@@ -57,6 +59,8 @@ type IFormData =
       centerY: number;
       centerX: number;
       zoomLevel: number;
+      minZoomLevel: number;
+      maxZoomLevel: number;
     };
 
 const MapManage: FC = () => {
@@ -76,8 +80,8 @@ const MapManage: FC = () => {
       setMapConfig({
         center: [formData.centerLat, formData.centerLnt],
         zoom: formData.zoomLevel,
-        minZoom: formData.zoomLevel,
-        maxZoom: formData.zoomLevel,
+        minZoom: formData.minZoomLevel,
+        maxZoom: formData.maxZoomLevel,
         zoomControl: false,
         attributionControl: false,
         layers: [new TileLayer(formData.sourceURL)],
@@ -93,8 +97,8 @@ const MapManage: FC = () => {
       setMapConfig({
         center: [formData.centerY, formData.centerX],
         zoom: formData.zoomLevel,
-        minZoom: formData.zoomLevel,
-        maxZoom: formData.zoomLevel,
+        minZoom: formData.minZoomLevel,
+        maxZoom: formData.maxZoomLevel,
         zoomControl: false,
         attributionControl: false,
         crs: CRS.Simple,
@@ -131,6 +135,8 @@ const MapManage: FC = () => {
           centerY: data.mapOptions.center[0],
           centerX: data.mapOptions.center[1],
           zoomLevel: data.mapOptions.zoom,
+          minZoomLevel: data.mapOptions.minZoom,
+          maxZoomLevel: data.mapOptions.maxZoom,
         };
         form.setFieldsValue(formData);
         previewMap(formData);
@@ -141,6 +147,8 @@ const MapManage: FC = () => {
           centerLat: data.mapOptions.center[0],
           centerLnt: data.mapOptions.center[1],
           zoomLevel: data.mapOptions.zoom,
+          minZoomLevel: data.mapOptions.minZoom,
+          maxZoomLevel: data.mapOptions.maxZoom,
         };
         form.setFieldsValue(formData);
         previewMap(formData);
@@ -169,8 +177,8 @@ const MapManage: FC = () => {
           mapOptions: {
             center: [formData.centerLat, formData.centerLnt],
             zoom: formData.zoomLevel,
-            minZoom: formData.zoomLevel,
-            maxZoom: formData.zoomLevel,
+            minZoom: formData.minZoomLevel,
+            maxZoom: formData.maxZoomLevel,
             zoomControl: false,
             attributionControl: false,
           },
@@ -195,8 +203,8 @@ const MapManage: FC = () => {
           mapOptions: {
             center: [formData.centerY, formData.centerX],
             zoom: formData.zoomLevel,
-            minZoom: formData.zoomLevel,
-            maxZoom: formData.zoomLevel,
+            minZoom: formData.minZoomLevel,
+            maxZoom: formData.maxZoomLevel,
             zoomControl: false,
             attributionControl: false,
           },
@@ -294,14 +302,6 @@ const MapManage: FC = () => {
                     </Form.Item>
                   </Space>
                 </Form.Item>
-
-                <Form.Item
-                  label="缩放等级"
-                  name="zoomLevel"
-                  rules={[{ required: true }]}
-                >
-                  <InputNumber />
-                </Form.Item>
               </>
             )}
 
@@ -313,7 +313,7 @@ const MapManage: FC = () => {
                   valuePropName="fileList"
                   getValueFromEvent={(e) => e?.fileList}
                   rules={[{ required: true }]}
-                  labelCol={{ span: 3.5 }}
+                  // labelCol={{ span: 3.5 }}
                 >
                   <Upload
                     beforeUpload={() => false}
@@ -385,16 +385,32 @@ const MapManage: FC = () => {
                     </Form.Item>
                   </Space>
                 </Form.Item>
-
-                <Form.Item
-                  label="缩放等级"
-                  name="zoomLevel"
-                  rules={[{ required: true }]}
-                >
-                  <InputNumber />
-                </Form.Item>
               </>
             )}
+
+            <Form.Item
+              label="默认缩放等级"
+              name="zoomLevel"
+              rules={[{ required: true }]}
+            >
+              <InputNumber />
+            </Form.Item>
+
+            <Form.Item
+              label="最小缩放等级"
+              name="minZoomLevel"
+              rules={[{ required: true }]}
+            >
+              <InputNumber />
+            </Form.Item>
+
+            <Form.Item
+              label="最大缩放等级"
+              name="maxZoomLevel"
+              rules={[{ required: true }]}
+            >
+              <InputNumber />
+            </Form.Item>
 
             <Form.Item wrapperCol={{ offset: 2 }}>
               <Space>
