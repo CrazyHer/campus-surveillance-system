@@ -10,8 +10,8 @@ export default {
   FETCH_ROOT: '',
   HLS_LOWLATENCY_OPTION: {
     enableWorker: true,
-    liveSyncDuration: 1,
-    liveMaxLatencyDuration: 5,
+    liveSyncDurationCount: 2,
+    liveMaxLatencyDurationCount: 4,
     liveDurationInfinity: true,
     highBufferWatchdogPeriod: 1,
     lowLatencyMode: true,
