@@ -35,8 +35,8 @@ def getOfflineCameraIDs(httpServerUrl, adminUsername, password):
 def ffmpegStreamToRtmpServer(streamUrl, rtmpUrl):
     print("exec ffmpeg...")
     os.execvp(
-        "/bin/ffmpeg",
-        f"/bin/ffmpeg -hide_banner -loglevel error -i {streamUrl} -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv {rtmpUrl}".split(
+        "/usr/bin/ffmpeg",
+        f"/usr/bin/ffmpeg -hide_banner -loglevel error -i {streamUrl} -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv {rtmpUrl}".split(
             " "
         ),
     )
