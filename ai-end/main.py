@@ -36,7 +36,7 @@ def ffmpegStreamToRtmpServer(streamUrl, rtmpUrl):
     print("exec ffmpeg...")
     os.execvp(
         "/usr/bin/ffmpeg",
-        f"/bin/ffmpeg -hide_banner -loglevel error -i {streamUrl} -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv {rtmpUrl}".split(
+        f"/usr/bin/ffmpeg -hide_banner -loglevel error -i {streamUrl} -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv {rtmpUrl}".split(
             " "
         ),
     )
