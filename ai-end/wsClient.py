@@ -112,10 +112,11 @@ class WSClient:
             'predictResult': Any
         }
         """
+        matchedRules = []
         if not self.ready:
             raise Exception("not ready or disconnected")
         if self.alarmRules is None:
-            return None
+            return matchedRules
         for rule in self.alarmRules:
             if (
                 rule["enabled"]
@@ -136,8 +137,8 @@ class WSClient:
                     > self.throttleTime
                 )
             ):
-                return rule
-        return None
+                matchedRules.append(rule)
+        return matchedRules
 
     async def trySendAlarm(self, data):
         """
@@ -147,31 +148,29 @@ class WSClient:
             'predictResult': Any
         }
         """
-        rule = self.matchAlarmRule(data)
-        if rule is None:
-            return
+        rules = self.matchAlarmRule(data)
+        for rule in rules:
+            """
+            AlarmData: {
+                picBase64: string;
+                alarmRuleID: number;
+            }
+            """
+            await self.sio.emit(
+                "alarm",
+                {
+                    "alarmRuleID": rule["id"],
+                    "picBase64": "data:image/jpg;base64,"
+                    + base64.b64encode(
+                        cv2.imencode(".jpg", data["predictResult"].plot())[1]
+                    ).decode("utf-8"),
+                },
+            )
+            # 防止短时间内重复发送
+            self.alarmThrottle[rule["id"]] = datetime.now()
+            print(f"camera {self.cameraID} alarm sent: {rule['name']}")
+            pass
 
-        """
-        AlarmData: {
-            picBase64: string;
-            alarmRuleID: number;
-        }
-        """
-        await self.sio.emit(
-            "alarm",
-            {
-                "alarmRuleID": rule["id"],
-                "picBase64": "data:image/jpg;base64,"
-                + base64.b64encode(
-                    cv2.imencode(".jpg", data["predictResult"].plot())[1]
-                ).decode("utf-8"),
-            },
-        )
-
-        # 防止短时间内重复发送
-        self.alarmThrottle[rule["id"]] = datetime.now()
-
-        print(f"camera {self.cameraID} alarm sent: {rule['name']}")
         pass
 
     async def disconnect(self):
