@@ -29,17 +29,25 @@ def getOfflineCameraIDs(httpServerUrl, adminUsername, password):
 
 # Windows推流本机摄像头到rtmp://localhost:1515/hls/3
 # ffmpeg -list_devices true -f dshow -i dummy
-# ffmpeg -f dshow -i video="USB2.0 HD UVC WebCam" -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv rtmp://192.169.3.3:1515/live/3
+# ffmpeg -f dshow -i video="USB2.0 HD UVC WebCam" -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f:v flv -c:a copy rtmp://192.169.3.3:1515/live/3
 
 
-def ffmpegStreamToRtmpServer(streamUrl, rtmpUrl):
+def ffmpegStreamToRtmpServer(streamUrl: str, rtmpUrl: str):
     print("exec ffmpeg...")
-    os.execvp(
-        "/usr/bin/ffmpeg",
-        f"/usr/bin/ffmpeg -hide_banner -loglevel error -i {streamUrl} -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f flv {rtmpUrl}".split(
-            " "
-        ),
-    )
+    if streamUrl.startswith("rtsp"):
+        os.execvp(
+            "/usr/bin/ffmpeg",
+            f"/usr/bin/ffmpeg -hide_banner -loglevel error -rtsp_transport tcp -i {streamUrl} -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f:v flv -c:a copy {rtmpUrl}".split(
+                " "
+            ),
+        )
+    else:
+        os.execvp(
+            "/usr/bin/ffmpeg",
+            f"/usr/bin/ffmpeg -hide_banner -loglevel error -i {streamUrl} -c:v libx264 -preset:v ultrafast -tune:v zerolatency -g 30 -f:v flv -c:a copy {rtmpUrl}".split(
+                " "
+            ),
+        )
     pass
 
 
@@ -54,13 +62,13 @@ async def beginWork(ws: WSClient):
         ffmpegProcess.start()
 
         print(
-            f"Begin to detect video for camera {ws.cameraID}, streamUrl: {ws.rtspUrl}"
+            f"Begin to detect video for camera {ws.cameraID}, streamUrl: {ws.rtspUrl} \nIf wait too long, please check if the stream url is correct."
         )
-        print(f"if wait too long, please check if the stream url is correct")
         results = model.detectVideo(ws.rtspUrl, classList=[0, 2])  # 0:person, 2:car
 
         for frameResult in results:
             clsCount = model.getResultClsCount(frameResult)
+
             await ws.trySendAlarm(
                 {
                     "algorithmType": "body",
@@ -75,6 +83,7 @@ async def beginWork(ws: WSClient):
                     "predictResult": frameResult,
                 }
             )
+
             if not ffmpegProcess.is_alive():
                 print(f"ffmpeg process for camera {ws.cameraID} is dead")
                 break
