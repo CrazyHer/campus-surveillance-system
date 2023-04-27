@@ -75,22 +75,30 @@ export interface FetchTypes {
   'GET /api/user/getAlarmEvents': {
     req: {
       cameraID?: number;
+      current?: number;
+      pageSize?: number;
+      alarmType?: string;
+      cameraName?: string;
+      resolved?: string;
     };
     res: {
       data: {
-        eventID: number;
-        alarmTime: string;
-        alarmRule: {
-          alarmRuleID: number;
-          alarmRuleName: string;
-        };
-        resolved: boolean;
-        cameraID: number;
-        cameraName: string;
-        cameraLatlng: [number, number];
-        cameraModel: string;
-        alarmPicUrl: string;
-      }[];
+        total: number;
+        list: {
+          eventID: number;
+          alarmTime: string;
+          alarmRule: {
+            alarmRuleID: number;
+            alarmRuleName: string;
+          };
+          resolved: boolean;
+          cameraID: number;
+          cameraName: string;
+          cameraLatlng: [number, number];
+          cameraModel: string;
+          alarmPicUrl: string;
+        }[];
+      };
       message: string;
       success: boolean;
     };

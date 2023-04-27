@@ -12,6 +12,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
     "@umijs/plugins": "^4.0.66",
+    "ahooks": "^3.7.6",
     "antd": "^5.4.4",
     "antd-img-crop": "^4.12.2",
     "crypto-js": "^4.1.1",

@@ -2,14 +2,25 @@ import mobxStore from '@/mobxStore';
 import type ServiceTypes from './serviceTypes';
 import constants from '@/constants';
 
-const fetchData = async (api: string, data: any): Promise<any> => {
+const fetchData = async (
+  api: string,
+  _data?: Record<string, any>,
+): Promise<any> => {
   const [method, url] = api.split(' ');
   const Authorization = mobxStore.user.getToken();
   let res: Response;
+  const data: Record<string, any> = {};
+  _data &&
+    Object.keys(_data).forEach((key) => {
+      if (_data[key] !== undefined && _data[key] !== null) {
+        data[key] = _data[key];
+      }
+    });
+
   if (method === 'GET') {
     res = await fetch(
       `${constants.FETCH_ROOT}${url}${
-        data ? '?' + new URLSearchParams(data ).toString() : ''
+        data ? '?' + new URLSearchParams(data).toString() : ''
       }`,
       {
         headers: { Authorization },
@@ -23,7 +34,7 @@ const fetchData = async (api: string, data: any): Promise<any> => {
         'Content-Type': 'application/json; charset=utf-8',
       },
       method,
-      body: data instanceof FormData ? data : JSON.stringify(data),
+      body: JSON.stringify(data),
     });
   }
 

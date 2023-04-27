@@ -78,11 +78,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME  }}
           password: ${{ secrets.DOCKERHUB_TOKEN  }}
 
+      - id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.DOCKERHUB_SYSTEM_IMAGE }}
+
       - name: Build and push Docker images
         uses: docker/build-push-action@v4.0.0
         with:
           push: true
-          tags: ${{ env.DOCKERHUB_SYSTEM_IMAGE }}:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           context: .
           file: ./front-backend.Dockerfile
 
@@ -97,10 +103,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME  }}
           password: ${{ secrets.DOCKERHUB_TOKEN  }}
 
+      - id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.DOCKERHUB_AI_IMAGE }}
+
       - name: Build and push Docker images
         uses: docker/build-push-action@v4.0.0
         with:
           push: true
-          tags: ${{ env.DOCKERHUB_AI_IMAGE }}:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           context: .
           file: ./ai-end.Dockerfile

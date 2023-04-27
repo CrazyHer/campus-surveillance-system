@@ -187,7 +187,7 @@ class WSClient:
         self.alarmRules = data["alarmRules"]
         print(f"Camera {self.cameraID} config updated")
 
-        if self.ready is False:
+        if self.connected and not self.ready:
             self.ready = True
             asyncio.get_event_loop().create_task(self.onReady(self))
 

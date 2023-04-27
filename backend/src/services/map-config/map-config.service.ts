@@ -19,6 +19,6 @@ export class MapConfigService {
   }
 
   async updateConfig(config: Partial<MapConfig>) {
-    await this.mapConfigRepo.insert(config);
+    await this.mapConfigRepo.save(config);
   }
 }
