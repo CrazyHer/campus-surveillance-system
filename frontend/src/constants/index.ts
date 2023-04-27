@@ -6,7 +6,7 @@ export default {
     VEHICLE: 'vehicle',
   },
   SHA256KEY: 'campus-surveillance-system',
-  // FETCH_ROOT: '//localhost:3000',
+  // FETCH_ROOT: 'http://surveillance.crazyher.cn',
   FETCH_ROOT: '',
   HLS_LOWLATENCY_OPTION: {
     enableWorker: true,

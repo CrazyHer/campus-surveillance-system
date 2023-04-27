@@ -120,31 +120,48 @@ export class UserController {
 
   @Get('/api/user/getAlarmEvents')
   async getAlarmEvents(
-    @Query('cameraID')
-    cameraID: FetchTypes['GET /api/user/getAlarmEvents']['req']['cameraID'],
+    @Query()
+    query: FetchTypes['GET /api/user/getAlarmEvents']['req'],
   ): Promise<FetchTypes['GET /api/user/getAlarmEvents']['res']['data']> {
-    return (
-      (cameraID
-        ? await this.alarmEventService.getByCameraId(cameraID, true, true)
-        : await this.alarmEventService.getList(true, true)
-      )?.map((event) => ({
-        eventID: event.id,
-        alarmTime: dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-        alarmRule: {
-          alarmRuleID: event?.alarmRule?.id ?? 0,
-          alarmRuleName: event?.alarmRule?.name ?? '',
-        },
-        resolved: event.resolved,
-        cameraID: event?.sourceCamera?.id ?? 0,
-        cameraName: event?.sourceCamera?.name ?? '',
-        cameraLatlng: [
-          Number(event?.sourceCamera?.latitude),
-          Number(event?.sourceCamera?.longitude),
-        ],
-        cameraModel: event?.sourceCamera?.model ?? '',
-        alarmPicUrl: this.utilsService.filePathToURL(event.picFilePath),
-      })) ?? []
+    const res = await this.alarmEventService.getList(
+      true,
+      true,
+      query.current,
+      query.pageSize,
+      {
+        resolved:
+          query.resolved === 'true'
+            ? true
+            : query.resolved === 'false'
+            ? false
+            : undefined,
+        cameraID: query.cameraID,
+        alarmRuleName: query.alarmType,
+        cameraName: query.cameraName,
+      },
     );
+
+    return {
+      list:
+        res.list.map((event) => ({
+          eventID: event.id,
+          alarmTime: dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+          alarmRule: {
+            alarmRuleID: event?.alarmRule?.id ?? 0,
+            alarmRuleName: event?.alarmRule?.name ?? '',
+          },
+          resolved: event.resolved,
+          cameraID: event?.sourceCamera?.id ?? 0,
+          cameraName: event?.sourceCamera?.name ?? '',
+          cameraLatlng: [
+            Number(event?.sourceCamera?.latitude),
+            Number(event?.sourceCamera?.longitude),
+          ] as [number, number],
+          cameraModel: event?.sourceCamera?.model ?? '',
+          alarmPicUrl: this.utilsService.filePathToURL(event.picFilePath),
+        })) ?? [],
+      total: res.total,
+    };
   }
 
   @Get('/api/user/getMonitList')

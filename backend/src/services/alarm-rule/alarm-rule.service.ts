@@ -36,7 +36,7 @@ export class AlarmRuleService {
   }
 
   async addRule(rule: Partial<AlarmRule>) {
-    return await this.alarmRuleRepo.insert(rule);
+    return await this.alarmRuleRepo.save(rule);
   }
 
   async updateRule(rule: Partial<AlarmRule>) {

@@ -39,7 +39,7 @@ export class UserService {
   }
 
   async addUser(user: Partial<User>) {
-    return await this.userRepo.insert(user);
+    return await this.userRepo.save(user);
   }
 
   async deleteUser(username: string) {

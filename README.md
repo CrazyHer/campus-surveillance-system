@@ -47,7 +47,7 @@ PS：若要本地搭建地图切片服务器，可参考[openstreetmap-tile-serv
 ```shell
 docker run  -p 8080:80 \
             -p 1515:1515 \
-            -e MYSQL_HOST=localhost \
+            -e MYSQL_HOST=172.17.0.1 \
             -e MYSQL_PORT=3306 \
             -e MYSQL_DATABASE=campus-surveillance-system \
             -e MYSQL_USER=root \
@@ -62,8 +62,8 @@ docker run  -p 8080:80 \
 监控算法端单独打包构建为 Docke Image：[crazyher/campus-surveillance-ai-end](https://hub.docker.com/repository/docker/crazyher/campus-surveillance-ai-end/general)
 
 ```shell
-docker run -e HTTP_SERVER_URL="http://localhost" \
-           -e RTMP_SERVER_URL="rtmp://localhost:1515/live" \
+docker run -e HTTP_SERVER_URL="http://172.17.0.1" \
+           -e RTMP_SERVER_URL="rtmp://172.17.0.1:1515/live" \
            -e ADMIN_USERNAME="admin" \
            -e ADMIN_PASSWORD="admin" \
            --name campus-surveillance-ai-end \
