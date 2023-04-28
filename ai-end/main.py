@@ -87,7 +87,7 @@ async def beginWork(ws: WSClient):
             if not ffmpegProcess.is_alive():
                 print(f"ffmpeg process for camera {ws.cameraID} is dead")
                 break
-            await asyncio.sleep(ws.context.get("interval", 1))
+            await asyncio.sleep(int(ws.context.get("interval", 1)))
 
             pass
     finally:
@@ -114,7 +114,7 @@ def main(
             password,
             str(cameraID),
             beginWork,
-            {"interval": detectionInterval},
+            {"interval": int(detectionInterval)},
         ).stayConnected()
     )
     pass
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     else:
         cameraIDs = getOfflineCameraIDs(httpServerUrl, adminUsername, password)
 
-    detectionInterval = os.getenv("DETECTION_INTERVAL", 1)
+    detectionInterval = int(os.getenv("DETECTION_INTERVAL", 1))
 
     processes = []
     # start a process for each camera
