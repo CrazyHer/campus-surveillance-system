@@ -1,5 +1,10 @@
 FROM continuumio/miniconda3:latest
 
+ENV TZ=Asia/Shanghai
+RUN echo $TZ > /etc/timezone && \
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+  dpkg-reconfigure -f noninteractive tzdata
+
 COPY ./ai-end /usr/share/campus-surveillance-system/ai-end
 
 WORKDIR /usr/share/campus-surveillance-system/ai-end
