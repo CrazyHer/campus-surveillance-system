@@ -122,6 +122,7 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (this.connecetedClients.has(data.cameraID)) {
         this.connecetedClients.get(data.cameraID)?.disconnect();
         this.connecetedClients.delete(data.cameraID);
+        await sleep(1000);
       }
 
       client.data = data;
@@ -164,3 +165,11 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`client ${data.cameraID} disconnected`);
   }
 }
+
+const sleep = async (ms: number) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(null);
+    }, ms);
+  });
+};
