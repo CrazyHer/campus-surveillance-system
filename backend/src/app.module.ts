@@ -1,10 +1,11 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ControllersModule } from './controllers/controllers.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { WsGatewaysModule } from './ws-gateways/ws-gateways.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
