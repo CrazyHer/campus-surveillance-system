@@ -1,3 +1,4 @@
+import { Inject, forwardRef } from '@nestjs/common';
 import {
   WebSocketServer,
   SubscribeMessage,
@@ -40,9 +41,13 @@ export class AiEndGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   wsServer: Server;
   constructor(
+    @Inject(forwardRef(() => CameraService))
     private cameraService: CameraService,
+    @Inject(forwardRef(() => AlarmEventService))
     private alarmEventService: AlarmEventService,
+    @Inject(forwardRef(() => UserService))
     private userService: UserService,
+    @Inject(forwardRef(() => UtilsService))
     private utilsService: UtilsService,
   ) {}
 

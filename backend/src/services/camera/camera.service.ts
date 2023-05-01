@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Camera } from './camera.entity';
-import { ConfigService } from '@nestjs/config';
+import { AiEndGateway } from 'src/ws-gateways/ai-end/ai-end.gateway';
 
 @Injectable()
 export class CameraService {
   constructor(
     @InjectRepository(Camera) private cameraRepo: Repository<Camera>,
-    private configService: ConfigService,
+    @Inject(forwardRef(() => AiEndGateway))
+    private aiEndGateway: AiEndGateway,
   ) {}
 
   async getList(
@@ -51,16 +52,22 @@ export class CameraService {
   }
 
   async addCamera(camera: Partial<Camera>) {
-    return await this.cameraRepo.save(camera);
+    const savedCamera = await this.cameraRepo.save(camera);
+
+    await this.aiEndGateway.notifyCameraConfigChange(savedCamera.id);
   }
 
   async updateCamera(camera: Partial<Camera>) {
     if (!camera.id) return;
-    await this.cameraRepo.save(camera);
+    const savedCamera = await this.cameraRepo.save(camera);
+
+    await this.aiEndGateway.notifyCameraConfigChange(savedCamera.id);
   }
 
   async deleteCamera(cameraID: number) {
     await this.cameraRepo.softDelete({ id: cameraID });
+
+    await this.aiEndGateway.notifyCameraConfigChange(cameraID);
   }
 
   getHlsUrl(cameraID: number): string {

@@ -1,5 +1,5 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
-  CACHE_MANAGER,
   CanActivate,
   ExecutionContext,
   Inject,
