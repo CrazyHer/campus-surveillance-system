@@ -28,4 +28,5 @@ export default defineConfig({
   locale: { default: 'zh-CN', antd: false, baseSeparator: '-' },
   publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
   history: { type: 'hash' },
+  metas: [{ name: 'viewport', content: 'width=1080, initial-scale=1' }],
 });

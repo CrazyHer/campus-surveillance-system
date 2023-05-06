@@ -6,12 +6,12 @@ import base64
 import json
 import cv2
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 class WSClient:
     __SHA256KEY = "campus-surveillance-system".encode("utf-8")
-    sio = socketio.AsyncClient()
+    sio = socketio.AsyncClient(reconnection=False)
     wsServerUrl = None
     rtmpServerUrl = None
 
@@ -114,7 +114,7 @@ class WSClient:
         """
         matchedRules = []
         if not self.ready:
-            raise Exception("not ready or disconnected")
+            raise Exception(f"CameraID {self.cameraID} not ready or disconnected")
         if self.alarmRules is None:
             return matchedRules
         for rule in self.alarmRules:
