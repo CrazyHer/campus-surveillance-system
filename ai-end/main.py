@@ -57,7 +57,7 @@ async def beginWork(ws: WSClient):
         target=ffmpegStreamToRtmpServer, args=(ws.rtspUrl, rtmpUrl), daemon=True
     )
     try:
-        model = YOLOModel()
+        model = YOLOModel(device=ws.context.get("modelDevice", "cpu"))
 
         ffmpegProcess.start()
 
@@ -105,6 +105,7 @@ def main(
     password="",
     cameraID="",
     detectionInterval=0.5,
+    modelDevice="cpu",
 ):
     asyncio.run(
         WSClient(
@@ -114,7 +115,7 @@ def main(
             password,
             str(cameraID),
             beginWork,
-            {"interval": float(detectionInterval)},
+            {"interval": float(detectionInterval), "modelDevice": modelDevice},
         ).stayConnected()
     )
     pass
@@ -134,6 +135,7 @@ if __name__ == "__main__":
         cameraIDs = getOfflineCameraIDs(httpServerUrl, adminUsername, password)
 
     detectionInterval = float(os.getenv("DETECTION_INTERVAL", 0.5))
+    modelDevice = os.getenv("MODEL_DEVICE", "cpu")
 
     processes = []
     # start a process for each camera
@@ -147,6 +149,7 @@ if __name__ == "__main__":
                 password,
                 cameraID,
                 detectionInterval,
+                modelDevice,
             ),
         )
         p.start()

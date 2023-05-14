@@ -18,6 +18,7 @@ class YOLOModel:
             conf=self.conf,
             line_thickness=1,
             classes=classList,
+            device=self.device,
         )[0]
         result.clsCount = self.getResultClsCount(result)
         return result

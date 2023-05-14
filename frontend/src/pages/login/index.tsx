@@ -53,15 +53,21 @@ const Login: FC = () => {
 
   return (
     <div className={Style.body}>
-      <div className={Style.leftPic} />
-      <div className={Style.rightContent}>
-        <img className={Style.icon} src={brandIcon} />
-        <div className={Style.title}>智慧园区 · 监控管理系统</div>
+      <div className={Style.content}>
+        <div className={Style.brandTag}>
+          <img className={Style.icon} src={brandIcon} />
+          智慧园区 · 监控管理系统
+        </div>
+
         <Form
           className={Style.loginForm}
           onFinish={handleLogin}
           form={loginForm}
+          title="账号登录"
         >
+          <Form.Item noStyle>
+            <div className={Style.title}>账号登录</div>
+          </Form.Item>
           <Form.Item
             name="username"
             rules={[{ required: true, message: '请输入账号!' }]}
