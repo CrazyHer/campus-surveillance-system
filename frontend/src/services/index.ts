@@ -43,10 +43,13 @@ const fetchData = async (
     throw new Error('请重新登录');
   }
 
-  const result = await res.json();
-  if (result.success) return result;
-
-  throw new Error(result.message || res.statusText);
+  if (res.ok) {
+    const result = await res.json();
+    if (result.success) return result;
+    throw new Error(result.message || res.statusText);
+  } else {
+    throw new Error(res.statusText);
+  }
 };
 
 export default new Proxy(

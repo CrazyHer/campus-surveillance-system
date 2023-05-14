@@ -4,40 +4,47 @@ body {
 
 .body {
   display: flex;
-  justify-content: start;
+  justify-content: center;
   align-items: center;
   height: 100vh;
   width: 100vw;
-  background: #f0f2f5;
-}
-
-.leftPic {
-  height: 100%;
-  max-width: 60vw;
-  background: url(../../assets/loginPic1.jpg) no-repeat center;
+  background: url(../../assets/login-bg.jpeg) no-repeat center;
   background-size: cover;
-  flex-shrink: 1;
-  flex-grow: 1;
 }
 
-.rightContent {
-  margin: 32px;
+.brandTag {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.content {
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: rgba(240, 248, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
 }
 
 .icon {
-  width: 120px;
-  height: 120px;
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
   object-fit: contain;
 }
 
 .title {
-  margin: 16px;
-  font-size: large;
+  margin-bottom: 16px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .loginForm {
   width: 300px;
+  margin: 16px;
 }

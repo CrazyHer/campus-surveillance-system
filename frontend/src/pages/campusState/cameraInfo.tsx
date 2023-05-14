@@ -77,6 +77,7 @@ const CameraInfo: FC<{
         ) : (
           <div style={{ color: 'red' }}>{value}</div>
         ),
+      width: '100px',
       sortOrder: 'descend',
       sorter: (a, b) => a.eventID - b.eventID,
     },
@@ -88,9 +89,11 @@ const CameraInfo: FC<{
         ) : (
           <div style={{ color: 'red' }}>{record.alarmRule.alarmRuleName}</div>
         ),
+      width: '180px',
     },
     {
       title: '操作',
+      align: 'center',
       render: (_value, record) =>
         record.resolved ? (
           '已处理'
